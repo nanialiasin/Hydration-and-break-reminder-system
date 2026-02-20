@@ -1,0 +1,212 @@
+:root {
+    font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #4a4d54;
+    padding: 20px;
+}
+
+.app-shell {
+    width: min(430px, 100%);
+    min-height: min(890px, 96vh);
+    background: #cfd2db;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.status-bar {
+    height: 48px;
+    background: #15171d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+}
+
+.time {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.content {
+    flex: 1;
+    padding: 24px 18px 20px;
+    overflow-y: auto;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 26px;
+}
+
+.back-btn {
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 32px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.activities {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.activity-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.activity-icon {
+    width: 24px;
+    height: 24px;
+    stroke: #1f2937;
+}
+
+.activity-time {
+    text-align: right;
+}
+
+.date {
+    margin: 0 0 2px;
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.duration {
+    margin: 0;
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.hydration-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hydration-label {
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 18px;
+    background: #b8d4dd;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4c7d8f, #6b9aac);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.bottom-nav {
+    background: #1d1f26;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 68px;
+    border-top: 1px solid #2a2c34;
+    position: relative;
+}
+
+.bottom-nav::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 4px;
+    background: #fff;
+    border-radius: 999px;
+}
+
+.nav-item {
+    color: #9ca3af;
+    padding: 8px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.nav-item.active {
+    color: #fff;
+}
+
+.nav-item:hover {
+    color: #d1d5db;
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 8px;
+    }
+
+    .app-shell {
+        width: min(96vw, 430px);
+        min-height: 94vh;
+    }
+
+    .content {
+        padding: 20px 14px 16px;
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+
+    .activity-name {
+        font-size: 18px;
+    }
+}
