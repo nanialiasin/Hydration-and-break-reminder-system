@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Active Session</title>
-    @vite('resources/css/session.css')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/css/session.css'); ?>
 </head>
 <body>
     <div class="app-shell">
         <div class="header">
-            <a href="{{ route('home') }}" class="back-button" aria-label="Go back">
+            <a href="<?php echo e(route('home')); ?>" class="back-button" aria-label="Go back">
                 <span>←</span>
             </a>
             <h1>Session</h1>
@@ -19,11 +19,11 @@
             <div class="stats-card">
                 <div class="stat-row">
                     <span class="stat-label">Temperature</span>
-                    <span class="stat-value">{{ $temp ?? 32 }}°C</span>
+                    <span class="stat-value"><?php echo e($temp ?? 32); ?>°C</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Humidity</span>
-                    <span class="stat-value">{{ $humidity ?? 74 }}%</span>
+                    <span class="stat-value"><?php echo e($humidity ?? 74); ?>%</span>
                 </div>
             </div>
 
@@ -35,34 +35,34 @@
                 <div class="timer" id="sessionTimer">00:00:00</div>
             </div>
 
-            <form method="POST" action="{{ route('session.end') }}" class="session-actions">
-                @csrf
+            <form method="POST" action="<?php echo e(route('session.end')); ?>" class="session-actions">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="btn btn-end">End Session</button>
             </form>
         </div>
 
         <nav class="bottom-nav" aria-label="Main navigation">
-            <a href="{{ route('home') }}" class="nav-item" aria-label="Home">
-                <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+            <a href="<?php echo e(route('home')); ?>" class="nav-item" aria-label="Home">
+                <img src="<?php echo e(asset('images/Home Button.png')); ?>" alt="Home" width="24" height="24">
             </a>
             <a href="#" class="nav-item" aria-label="Training">
-                <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
+                <img src="<?php echo e(asset('images/Training Button.svg')); ?>" alt="Training" width="24" height="24">
             </a>
-            <a href="{{ route('session.create') }}" class="nav-item" aria-label="Create">
-                <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
+            <a href="<?php echo e(route('session.create')); ?>" class="nav-item" aria-label="Create">
+                <img src="<?php echo e(asset('images/Create.svg')); ?>" alt="Create" width="24" height="24">
             </a>
-            <a href="{{ route('history') }}" class="nav-item" aria-label="History">
-                <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+            <a href="<?php echo e(route('history')); ?>" class="nav-item" aria-label="History">
+                <img src="<?php echo e(asset('images/History Button.svg')); ?>" alt="History" width="24" height="24">
             </a>
             <a href="#" class="nav-item" aria-label="Profile">
-                <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+                <img src="<?php echo e(asset('images/Account Button.svg')); ?>" alt="Account" width="24" height="24">
             </a>
         </nav>
     </div>
 
     <script>
         // Get the interval (minutes) passed from HydrationReminderController
-        let intervalMinutes = {{ $interval ?? 20 }}; 
+        let intervalMinutes = <?php echo e($interval ?? 20); ?>; 
         
         let hours = 0;
         let minutes = intervalMinutes;
@@ -102,4 +102,4 @@
         }, 1000);
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\Acer\Hydration-and-break-reminder-system\resources\views/session.blade.php ENDPATH**/ ?>

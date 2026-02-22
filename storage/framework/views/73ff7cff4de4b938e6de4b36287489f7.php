@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home</title>
-    @vite('resources/css/home.css')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/css/home.css'); ?>
 </head>
 <body>
     <main class="app-shell" role="main">
@@ -14,11 +14,11 @@
             <section class="stats-card">
                 <div class="stat-row">
                     <span class="stat-label">Temperature</span>
-                    <span class="stat-value">{{ $temp ?? 32 }}°C</span>
+                    <span class="stat-value"><?php echo e($temp ?? 32); ?>°C</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Humidity</span>
-                    <span class="stat-value">{{ $humidity ?? 74 }}%</span>
+                    <span class="stat-value"><?php echo e($humidity ?? 74); ?>%</span>
                 </div>
             </section>
 
@@ -42,25 +42,25 @@
 
         <nav class="bottom-nav" aria-label="Main navigation">
             <a href="#" class="nav-item active" aria-label="Home">
-                <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+                <img src="<?php echo e(asset('images/Home Button.png')); ?>" alt="Home" width="24" height="24">
             </a>
             <a href="#" class="nav-item" aria-label="Training">
-                <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
+                <img src="<?php echo e(asset('images/Training Button.svg')); ?>" alt="Training" width="24" height="24">
             </a>
-            <a href="{{ route('session.create') }}" class="nav-item" aria-label="Create">
-                <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
+            <a href="<?php echo e(route('session.create')); ?>" class="nav-item" aria-label="Create">
+                <img src="<?php echo e(asset('images/Create.svg')); ?>" alt="Create" width="24" height="24">
             </a>
-            <a href="{{ route('history') }}" class="nav-item" aria-label="History">
-                <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+            <a href="<?php echo e(route('history')); ?>" class="nav-item" aria-label="History">
+                <img src="<?php echo e(asset('images/History Button.svg')); ?>" alt="History" width="24" height="24">
             </a>
             <a href="#" class="nav-item" aria-label="Profile">
-                <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+                <img src="<?php echo e(asset('images/Account Button.svg')); ?>" alt="Account" width="24" height="24">
             </a>
         </nav>
     </main>
 
     <script>
-        const totalMinutes = {{ $interval ?? 12 }};
+        const totalMinutes = <?php echo e($interval ?? 12); ?>;
         let totalSeconds = totalMinutes * 60;
         const initialSeconds = totalSeconds;
 
@@ -91,4 +91,4 @@
         updateTimer();
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\Acer\Hydration-and-break-reminder-system\resources\views/home.blade.php ENDPATH**/ ?>
