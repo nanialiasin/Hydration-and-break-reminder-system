@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HydrationReminderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,9 +38,11 @@ Route::post('/register', function () {
     return redirect()->route('home');
 });
 
-Route::get('/home', function () {
-    return view('home');
-})->name('home');
+//Route::get('/home', function () {
+  //  return view('home');
+//})->name('home');
+
+Route::get('/home', [HydrationReminderController::class, 'showHome'])->name('home');
 
 Route::get('/history', function () {
     return view('history');
@@ -66,3 +69,11 @@ Route::post('/session/end', function () {
 Route::get('/session/completed', function () {
     return view('session-completed');
 })->name('session.completed');
+
+Route::post('/session/store', [HydrationReminderController::class, 'startSession'])
+    ->name('session.store');
+
+Route::post('/session/end', [HydrationReminderController::class, 'endSession'])
+    ->name('session.end');
+
+Route::post('/hydration/calculate', [HydrationReminderController::class, 'getReminderStatus']);
