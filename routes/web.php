@@ -44,31 +44,22 @@ Route::post('/register', function () {
 
 Route::get('/home', [HydrationReminderController::class, 'showHome'])->name('home');
 
-Route::get('/history', function () {
-    return view('history');
-})->name('history');
+Route::get('/history', [HydrationReminderController::class, 'showHistory'])->name('history');
 
 Route::get('/session/create', function () {
     return view('create-session');
 })->name('session.create');
 
-Route::post('/session/store', function () {
-    // TODO: Add actual session creation logic here
-    return redirect()->route('session.show');
-})->name('session.store');
+Route::get('/hydration/alert', function () {
+    return view('hydration-alert');
+})->name('hydration.alert');
 
 Route::get('/session', function () {
     return view('session');
 })->name('session.show');
 
-Route::post('/session/end', function () {
-    // TODO: Add session end logic (save to database)
-    return redirect()->route('session.completed');
-})->name('session.end');
-
-Route::get('/session/completed', function () {
-    return view('session-completed');
-})->name('session.completed');
+Route::get('/session/completed', [HydrationReminderController::class, 'showSessionCompleted'])
+    ->name('session.completed');
 
 Route::post('/session/store', [HydrationReminderController::class, 'startSession'])
     ->name('session.store');

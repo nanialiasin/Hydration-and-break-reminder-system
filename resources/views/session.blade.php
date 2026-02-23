@@ -37,6 +37,10 @@
 
             <form method="POST" action="{{ route('session.end') }}" class="session-actions">
                 @csrf
+                <input type="hidden" name="alerts" id="alertsInput" value="0">
+                <input type="hidden" name="followed" id="followedInput" value="0">
+                <input type="hidden" name="ignored" id="ignoredInput" value="0">
+                <input type="hidden" name="duration_seconds" id="durationSecondsInput" value="0">
                 <button type="submit" class="btn btn-end">End Session</button>
             </form>
         </div>
@@ -61,45 +65,157 @@
     </div>
 
     <script>
-        // Get the interval (minutes) passed from HydrationReminderController
-        let intervalMinutes = {{ $interval ?? 20 }}; 
-        
-        let hours = 0;
-        let minutes = intervalMinutes;
-        let seconds = 0;
+        const intervalMinutes = {{ $interval ?? 20 }};
+        const totalDurationMinutes = {{ $totalDuration ?? 30 }};
+        const hydrationAlertUrl = "{{ route('hydration.alert') }}";
+        const sessionStateStorageKey = 'hydrationActiveSession';
+
+        const intervalSeconds = 10;
+        let totalSessionSeconds = Math.max(60, totalDurationMinutes * 60);
+
+        let remainingSessionSeconds = totalSessionSeconds;
+        let reminderSeconds = intervalSeconds;
+        let alerts = 0;
+        let followed = 0;
+        let ignored = 0;
+        let sessionStartedAt = Date.now();
+        let pendingReminder = false;
+        let lastTickAt = Date.now();
 
         const timerElement = document.getElementById('sessionTimer');
 
-        // Function to format time string
-        const formatTime = (h, m, s) => {
+        const alertsInput = document.getElementById('alertsInput');
+        const followedInput = document.getElementById('followedInput');
+        const ignoredInput = document.getElementById('ignoredInput');
+        const durationSecondsInput = document.getElementById('durationSecondsInput');
+        const sessionForm = document.querySelector('.session-actions');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const hydrationAction = urlParams.get('hydration_action');
+        const shouldResumeFromAlert = Boolean(hydrationAction);
+
+        const persistState = () => {
+            const state = {
+                totalSessionSeconds,
+                remainingSessionSeconds,
+                reminderSeconds,
+                alerts,
+                followed,
+                ignored,
+                sessionStartedAt,
+                pendingReminder,
+                lastTickAt: Date.now(),
+            };
+
+            sessionStorage.setItem(sessionStateStorageKey, JSON.stringify(state));
+        };
+
+        const hydrateState = () => {
+            const raw = sessionStorage.getItem(sessionStateStorageKey);
+
+            if (!raw) {
+                return;
+            }
+
+            try {
+                const state = JSON.parse(raw);
+
+                totalSessionSeconds = Math.max(60, Number(state.totalSessionSeconds ?? totalSessionSeconds));
+                remainingSessionSeconds = Math.max(0, Number(state.remainingSessionSeconds ?? remainingSessionSeconds));
+                reminderSeconds = Math.max(1, Number(state.reminderSeconds ?? reminderSeconds));
+                alerts = Math.max(0, Number(state.alerts ?? alerts));
+                followed = Math.max(0, Number(state.followed ?? followed));
+                ignored = Math.max(0, Number(state.ignored ?? ignored));
+                sessionStartedAt = Number(state.sessionStartedAt ?? sessionStartedAt);
+                pendingReminder = Boolean(state.pendingReminder ?? false);
+                lastTickAt = Number(state.lastTickAt ?? lastTickAt);
+
+                const elapsedWhileAway = Math.floor((Date.now() - lastTickAt) / 1000);
+
+                if (elapsedWhileAway > 0) {
+                    remainingSessionSeconds = Math.max(0, remainingSessionSeconds - elapsedWhileAway);
+
+                    if (!pendingReminder) {
+                        reminderSeconds = Math.max(1, reminderSeconds - elapsedWhileAway);
+                    }
+                }
+            } catch (error) {
+                sessionStorage.removeItem(sessionStateStorageKey);
+            }
+        };
+
+        if (shouldResumeFromAlert) {
+            hydrateState();
+        } else {
+            sessionStorage.removeItem(sessionStateStorageKey);
+        }
+
+        if (pendingReminder && hydrationAction) {
+            if (hydrationAction === 'followed') {
+                followed++;
+            } else if (hydrationAction === 'snoozed') {
+                ignored++;
+            }
+
+            pendingReminder = false;
+            persistState();
+
+            urlParams.delete('hydration_action');
+            const cleanedUrl = `${window.location.pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ''}`;
+            window.history.replaceState({}, '', cleanedUrl);
+        }
+
+        const formatTime = (valueSeconds) => {
+            const h = Math.floor(valueSeconds / 3600);
+            const m = Math.floor((valueSeconds % 3600) / 60);
+            const s = valueSeconds % 60;
+
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         };
 
-        // Initialize display
-        timerElement.textContent = formatTime(hours, minutes, seconds);
+        const syncStatsToForm = () => {
+            const elapsedByClock = Math.floor((Date.now() - sessionStartedAt) / 1000);
+            const elapsedByTimer = totalSessionSeconds - remainingSessionSeconds;
+            const elapsed = Math.max(elapsedByClock, elapsedByTimer);
 
-        // Timer functionality - Countdown to 0
+            alertsInput.value = alerts;
+            followedInput.value = followed;
+            ignoredInput.value = ignored;
+            durationSecondsInput.value = Math.max(0, elapsed);
+
+            persistState();
+        };
+
+        timerElement.textContent = formatTime(remainingSessionSeconds);
+        syncStatsToForm();
+
         const countdown = setInterval(() => {
-            if (seconds === 0) {
-                if (minutes === 0) {
-                    if (hours === 0) {
-                        clearInterval(countdown);
-                        // TRIGGER REMINDER LOGIC
-                        alert("Time to hydrate! Drink water now.");
-                        return;
-                    }
-                    hours--;
-                    minutes = 59;
-                } else {
-                    minutes--;
-                }
-                seconds = 59;
-            } else {
-                seconds--;
+            if (remainingSessionSeconds <= 0) {
+                clearInterval(countdown);
+                syncStatsToForm();
+                return;
             }
-            
-            timerElement.textContent = formatTime(hours, minutes, seconds);
+
+            remainingSessionSeconds--;
+            reminderSeconds--;
+
+            if (reminderSeconds <= 0 && remainingSessionSeconds > 0) {
+                alerts++;
+                reminderSeconds = intervalSeconds;
+                pendingReminder = true;
+                syncStatsToForm();
+                window.location.href = hydrationAlertUrl;
+                return;
+            }
+
+            timerElement.textContent = formatTime(remainingSessionSeconds);
+            syncStatsToForm();
         }, 1000);
+
+        sessionForm.addEventListener('submit', () => {
+            syncStatsToForm();
+            sessionStorage.removeItem(sessionStateStorageKey);
+        });
     </script>
 </body>
 </html>

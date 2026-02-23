@@ -15,48 +15,40 @@
             </header>
 
             <div class="activities">
-                <article class="activity-card">
-                    <div class="activity-header">
-                        <div class="activity-name">
-                            <svg class="activity-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M8 12h8M12 8v8"></path>
-                            </svg>
-                            <span>Badminton</span>
+                @forelse(($sessions ?? collect()) as $session)
+                    <article class="activity-card">
+                        <div class="activity-header">
+                            <div class="activity-name">
+                                <svg class="activity-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M8 12h8M12 8v8"></path>
+                                </svg>
+                                <span>{{ ucfirst($session['sport']) }}</span>
+                            </div>
+                            <div class="activity-time">
+                                <p class="date">{{ $session['date'] }}</p>
+                                <p class="duration">{{ $session['duration'] }}</p>
+                            </div>
                         </div>
-                        <div class="activity-time">
-                            <p class="date">Yesterday</p>
-                            <p class="duration">1hr 15min</p>
+                        <div class="hydration-section">
+                            <span class="hydration-label">Hydration %</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ $session['hydration_score'] }}%;"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="hydration-section">
-                        <span class="hydration-label">Hydration %</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 85%;"></div>
+                    </article>
+                @empty
+                    <article class="activity-card empty-history">
+                        <div class="activity-header">
+                            <div class="activity-name">
+                                <span>No session history yet</span>
+                            </div>
                         </div>
-                    </div>
-                </article>
-
-                <article class="activity-card">
-                    <div class="activity-header">
-                        <div class="activity-name">
-                            <svg class="activity-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                            </svg>
-                            <span>Jogging</span>
+                        <div class="hydration-section">
+                            <span class="hydration-label">Complete a session to see it here.</span>
                         </div>
-                        <div class="activity-time">
-                            <p class="date">2 days ago</p>
-                            <p class="duration">45 min</p>
-                        </div>
-                    </div>
-                    <div class="hydration-section">
-                        <span class="hydration-label">Hydration %</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 65%;"></div>
-                        </div>
-                    </div>
-                </article>
+                    </article>
+                @endforelse
             </div>
         </div>
 

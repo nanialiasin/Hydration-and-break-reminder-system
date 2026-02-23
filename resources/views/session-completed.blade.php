@@ -7,6 +7,12 @@
     @vite('resources/css/session-completed.css')
 </head>
 <body>
+    @php
+        $score = max(0, min(100, (int) ($hydrationScore ?? 0)));
+        $circumference = 2 * pi() * 85;
+        $dashOffset = $circumference * (1 - ($score / 100));
+    @endphp
+
     <div class="app-shell">
         <div class="header">
             <h1>Session Completed!</h1>
@@ -17,19 +23,19 @@
                 <div class="stats-list">
                     <div class="stat-item">
                         <span class="stat-label">Duration</span>
-                        <span class="stat-value">1hr 15min</span>
+                        <span class="stat-value">{{ $durationText ?? '0min' }}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Alerts</span>
-                        <span class="stat-value">6</span>
+                        <span class="stat-value">{{ $alerts ?? 0 }}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Followed</span>
-                        <span class="stat-value">4</span>
+                        <span class="stat-value">{{ $followed ?? 0 }}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Ignored</span>
-                        <span class="stat-value">2</span>
+                        <span class="stat-value">{{ $ignored ?? 0 }}</span>
                     </div>
                 </div>
 
@@ -37,12 +43,18 @@
                     <svg class="score-ring" viewBox="0 0 200 200">
                         <!-- Background circle -->
                         <circle cx="100" cy="100" r="85" class="score-ring-bg"></circle>
-                        <!-- Progress circle (88%) -->
-                        <circle cx="100" cy="100" r="85" class="score-ring-progress"></circle>
+                        <!-- Progress circle -->
+                        <circle
+                            cx="100"
+                            cy="100"
+                            r="85"
+                            class="score-ring-progress"
+                            style="stroke-dasharray: {{ $circumference }}; stroke-dashoffset: {{ $dashOffset }};"
+                        ></circle>
                     </svg>
                     <div class="score-content">
                         <span class="score-label">Hydration<br>Score :</span>
-                        <span class="score-percentage">88%</span>
+                        <span class="score-percentage">{{ $score }}%</span>
                     </div>
                 </div>
 
