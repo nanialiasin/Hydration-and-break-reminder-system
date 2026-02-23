@@ -1,0 +1,87 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #4a4d54;
+    font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+}
+
+.alert-shell {
+    width: min(430px, 100%);
+    min-height: min(890px, 96vh);
+    background: #cfd2db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
+}
+
+.alert-card {
+    width: min(320px, 90%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+}
+
+.visual-wrap {
+    width: 280px;
+    height: 280px;
+    display: grid;
+    place-items: center;
+}
+
+.hydrate-visual {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transform: translateY(42px);
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: 400;
+}
+
+.btn-drink {
+    background: #101a06;
+    color: #ffffff;
+}
+
+.btn-snooze {
+    background: #c5c8d0;
+    color: #686b73;
+    position: relative;
+}
+
+.btn-snooze::before {
+    content: '';
+    width: 30px;
+    height: 42px;
+    border-radius: 999px;
+    background: #efefef;
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+}

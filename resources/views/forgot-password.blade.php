@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Forgot Password</title>
-    @vite('resources/css/password-reset.css')
+    @vite('resources/css/auth-password.css')
 </head>
 <body>
     <div class="phone-shell">

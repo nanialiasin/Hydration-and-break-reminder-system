@@ -84,6 +84,14 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+.empty-history .activity-name {
+    font-size: 18px;
+}
+
+.empty-history .hydration-label {
+    color: #6b7280;
+}
+
 .activity-header {
     display: flex;
     justify-content: space-between;

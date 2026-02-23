@@ -111,8 +111,8 @@ body {
     fill: none;
     stroke: #7ba8c5;
     stroke-width: 25;
-    stroke-dasharray: 476;
-    stroke-dashoffset: 57;
+    stroke-dasharray: 534.07;
+    stroke-dashoffset: 534.07;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.5s ease;
 }
