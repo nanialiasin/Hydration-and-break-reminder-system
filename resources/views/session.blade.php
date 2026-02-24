@@ -49,11 +49,8 @@
             <a href="{{ route('home') }}" class="nav-item" aria-label="Home">
                 <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
             </a>
-            <a href="#" class="nav-item" aria-label="Training">
+            <a href="{{ route('training') }}" class="nav-item" aria-label="Training">
                 <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
-            </a>
-            <a href="{{ route('session.create') }}" class="nav-item" aria-label="Create">
-                <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
             </a>
             <a href="{{ route('history') }}" class="nav-item" aria-label="History">
                 <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">

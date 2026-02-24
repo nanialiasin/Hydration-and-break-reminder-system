@@ -169,6 +169,52 @@ body {
     background: #0a2a0a;
 }
 
+.daily-stats-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 18px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.daily-stats-title {
+    margin: 0 0 12px;
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.daily-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.daily-stat-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.daily-stat-value {
+    margin: 0;
+    color: #4c7d8f;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.daily-stat-label {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 15px;
+    font-weight: 600;
+}
+
 .bottom-nav {
     background: #1d1f26;
     display: flex;
@@ -231,5 +277,13 @@ body {
 
     .timer-countdown {
         font-size: 42px;
+    }
+
+    .daily-stats-title {
+        font-size: 24px;
+    }
+
+    .daily-stat-value {
+        font-size: 30px;
     }
 }

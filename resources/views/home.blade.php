@@ -38,17 +38,28 @@
 
                 <button class="drink-btn">Drink Now</button>
             </section>
+
+            <section class="daily-stats-card" aria-label="Daily stats">
+                <h2 class="daily-stats-title">Daily Stats</h2>
+                <div class="daily-stats-grid">
+                    <article class="daily-stat-box">
+                        <p class="daily-stat-value">{{ $dayStreak ?? 0 }}</p>
+                        <p class="daily-stat-label">Day Streak</p>
+                    </article>
+                    <article class="daily-stat-box">
+                        <p class="daily-stat-value">{{ $weeklyAvg ?? 1500 }}ml</p>
+                        <p class="daily-stat-label">Weekly Avg</p>
+                    </article>
+                </div>
+            </section>
         </div>
 
         <nav class="bottom-nav" aria-label="Main navigation">
             <a href="#" class="nav-item active" aria-label="Home">
                 <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
             </a>
-            <a href="#" class="nav-item" aria-label="Training">
+            <a href="{{ route('training') }}" class="nav-item" aria-label="Training">
                 <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
-            </a>
-            <a href="{{ route('session.create') }}" class="nav-item" aria-label="Create">
-                <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
             </a>
             <a href="{{ route('history') }}" class="nav-item" aria-label="History">
                 <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
@@ -61,34 +72,47 @@
 
     <script>
         const totalMinutes = {{ $interval ?? 12 }};
-        let totalSeconds = totalMinutes * 60;
-        const initialSeconds = totalSeconds;
+        const intervalSeconds = totalMinutes * 60;
+        let totalSeconds = intervalSeconds;
+        let didExpire = false;
 
         const countdownElement = document.getElementById('homeCountdown');
         const ringProgress = document.getElementById('ringProgress');
+        const drinkButton = document.querySelector('.drink-btn');
         const circumference = 534; 
 
-        function updateTimer() {
+        function renderTimer() {
             const mins = Math.floor(totalSeconds / 60);
             const secs = totalSeconds % 60;
             
-            // Update text
             countdownElement.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
-            // Update ring visual
-            const offset = circumference - (totalSeconds / initialSeconds) * circumference;
+            const offset = circumference - (totalSeconds / intervalSeconds) * circumference;
             ringProgress.style.strokeDashoffset = offset;
+        }
 
-            if (totalSeconds <= 0) {
-                clearInterval(timerInterval);
-                alert("Reminder: Time to hydrate!"); // Trigger Reminder Logic
-            } else {
+        function resetTimer() {
+            totalSeconds = intervalSeconds;
+            didExpire = false;
+            renderTimer();
+        }
+
+        function updateTimer() {
+            if (totalSeconds > 0) {
                 totalSeconds--;
+                renderTimer();
+            }
+
+            if (totalSeconds <= 0 && !didExpire) {
+                didExpire = true;
+                alert("Reminder: Time to hydrate!");
             }
         }
 
+        drinkButton.addEventListener('click', resetTimer);
+
         const timerInterval = setInterval(updateTimer, 1000);
-        updateTimer();
+        renderTimer();
     </script>
 </body>
 </html>
