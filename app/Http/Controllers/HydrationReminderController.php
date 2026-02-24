@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\HydrationReminderService;
 use Illuminate\Http\JsonResponse;
 use App\Models\HydrationSession;
+use Carbon\Carbon;
 
 class HydrationReminderController extends Controller
 {
@@ -69,16 +70,27 @@ class HydrationReminderController extends Controller
     }
 
     public function showHome()
-{
-    // Use logic for the dashboard (32°C, 74%)
-    $interval = $this->hydrationService->calculateInterval(32, 74, 60);
+    {
+        $interval = $this->hydrationService->calculateInterval(32, 74, 60);
+        [$dayStreak, $weeklyAvgMl] = $this->getDailyStats();
 
-    return view('home', [
-        'interval' => $interval,
-        'temp' => 32,
-        'humidity' => 74
-    ]);
-}
+        return view('home', [
+            'interval' => $interval,
+            'temp' => 32,
+            'humidity' => 74,
+            'dayStreak' => $dayStreak,
+            'weeklyAvg' => $weeklyAvgMl,
+        ]);
+    }
+
+    public function showStreak()
+    {
+        [$dayStreak] = $this->getDailyStats();
+
+        return view('streak', [
+            'dayStreak' => $dayStreak,
+        ]);
+    }
 
     public function endSession(Request $request)
     {
@@ -202,5 +214,37 @@ class HydrationReminderController extends Controller
         }
 
         return "{$seconds}s";
+    }
+
+    private function getDailyStats(): array
+    {
+        $sessions = HydrationSession::query()
+            ->whereNotNull('completed_at')
+            ->get(['completed_at', 'followed']);
+
+        $completedDates = $sessions
+            ->map(fn (HydrationSession $session) => optional($session->completed_at)?->toDateString())
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $completedDateSet = array_flip($completedDates);
+        $dayStreak = 0;
+        $cursor = Carbon::today();
+
+        while (isset($completedDateSet[$cursor->toDateString()])) {
+            $dayStreak++;
+            $cursor->subDay();
+        }
+
+        $weekStart = Carbon::today()->subDays(6)->startOfDay();
+        $weeklyTotalMl = $sessions
+            ->filter(fn (HydrationSession $session) => $session->completed_at && $session->completed_at->greaterThanOrEqualTo($weekStart))
+            ->sum(fn (HydrationSession $session) => max(0, (int) $session->followed) * 250);
+
+        $weeklyAvgMl = (int) round($weeklyTotalMl / 7);
+
+        return [$dayStreak, $weeklyAvgMl];
     }
 }

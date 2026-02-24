@@ -11,6 +11,9 @@ Route::get('/login', function () {
     return view('login');
 })->name('login');
 
+Route::get('/streak', [HydrationReminderController::class, 'showStreak'])
+    ->name('streak');
+
 Route::get('/forgot-password', function () {
     return view('forgot-password');
 })->name('password.request');
@@ -43,6 +46,10 @@ Route::post('/register', function () {
 //})->name('home');
 
 Route::get('/home', [HydrationReminderController::class, 'showHome'])->name('home');
+
+Route::get('/training', function () {
+    return view('training');
+})->name('training');
 
 Route::get('/history', [HydrationReminderController::class, 'showHistory'])->name('history');
 

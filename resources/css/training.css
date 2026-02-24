@@ -1,0 +1,189 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #4a4d54;
+    padding: 20px;
+}
+
+.app-shell {
+    width: min(430px, 100%);
+    min-height: min(890px, 96vh);
+    background: #cfd2db;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
+    padding: 24px 18px 20px;
+    overflow-y: auto;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 26px;
+}
+
+.back-btn {
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 32px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.todo-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.todo-main h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.todo-main p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.todo-start-form {
+    margin: 0;
+}
+
+.todo-start-btn {
+    min-height: 42px;
+    min-width: 88px;
+    border: none;
+    border-radius: 10px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 16px;
+    transition: opacity 0.2s;
+}
+
+.todo-start-btn:hover {
+    opacity: 0.85;
+}
+
+.content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+.bottom-nav {
+    background: #1d1f26;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 68px;
+    border-top: 1px solid #2a2c34;
+    position: relative;
+}
+
+.bottom-nav::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 4px;
+    background: #fff;
+    border-radius: 999px;
+}
+
+.nav-item {
+    color: #9ca3af;
+    padding: 8px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.nav-item img {
+    filter: brightness(0.5);
+    transition: filter 0.2s;
+}
+
+.nav-item.active,
+.nav-item:hover {
+    color: #fff;
+}
+
+.nav-item.active img,
+.nav-item:hover img {
+    filter: brightness(1);
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 8px;
+    }
+
+    .app-shell {
+        width: min(96vw, 430px);
+        min-height: 94vh;
+    }
+
+    .content {
+        padding: 20px 14px 16px;
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+
+    .todo-main h2 {
+        font-size: 18px;
+    }
+}

@@ -81,7 +81,7 @@
             <a href="{{ route('home') }}" class="nav-item" aria-label="Home">
                 <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
             </a>
-            <a href="#" class="nav-item" aria-label="Training">
+            <a href="{{ route('training') }}" class="nav-item" aria-label="Training">
                 <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
             </a>
             <a href="{{ route('session.create') }}" class="nav-item active" aria-label="Create">
