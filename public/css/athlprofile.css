@@ -1,0 +1,172 @@
+.profile-page {
+    background-color: #e6f0fa; /* blue background */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 15px;
+    font-family: Arial, sans-serif;
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.profile-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Card Style */
+.profile-card {
+    background: #fff; /* white card */
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Avatar */
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 4px solid #222;
+    overflow: hidden;
+    margin: 0 auto 18px auto;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    background: #fff;
+    border: none;
+    display: block;
+}
+
+/* Athlete ID */
+.athlete-id {
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    border-bottom: 1px dashed #999;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+/* Text Info */
+.profile-info p {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+.status-active {
+    color: rgb(54, 220, 54);
+    font-weight: bold;
+}
+
+/* Toggle */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 45px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    background-color: #ccc;
+    border-radius: 34px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: .3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* Sliders */
+input[type="range"] {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    flex-direction: row;
+}
+
+.btn-danger {
+    width: 200px;
+    padding: 12px;
+    border-radius: 15px;
+    border: none;
+    background-color: #f5bcbc;
+    color: #b30000;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+}
+
+.btn-danger + .btn-danger {
+    margin-top: 0;
+}
+
+.btn-danger:hover {
+    background-color: #f29c9c;
+}
+
+input:disabled {
+    background-color: #f3f3f3;
+    cursor: not-allowed;
+}
+
+.edit-profile-btn {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    display: inline-block;
+}
+.edit-profile-btn:hover {
+    background: #e6f0fa;
+    text-decoration: none;
+}

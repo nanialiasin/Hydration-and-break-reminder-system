@@ -1,0 +1,88 @@
+.container {
+    padding: 10px;
+    margin-top: 20px;
+    /* ...existing code... */
+}
+
+.profile-card {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 12px 16px;
+    background: #f4f6f9;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.profile-card label {
+    display: block;
+    text-align: left;
+    margin-left: 2px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.input-field {
+    width: 100%;
+    padding: 7px;
+    margin: 6px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 32px;
+    margin: 6px 0;
+}
+
+.radio-group label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+    font-weight: 400;
+    gap: 4px;
+}
+
+.radio-group input[type="radio"] {
+    margin-bottom: 6px;
+}
+
+.btn-submit {
+    background: #0f1a0f;
+    color: white;
+    padding: 8px;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 18px;
+    text-decoration: none;
+    color: #0a4d68;
+    font-weight: bold;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: 0.2s ease;
+}
+
+.back-button:hover {
+    background: #e1f7ff;
+    color: rgb(0, 0, 0);
+    transform: scale(1.1);
+}
+
+img[alt="Hydrapulse Logo"] {
+    width: 100px !important;
+    height: 100px !important;
+    margin-bottom: 8px !important;
+}
