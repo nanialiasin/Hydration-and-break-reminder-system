@@ -14,7 +14,6 @@ class CoachProfileController extends Controller
 
     public function store(Request $request)
     {
-        // Generate unique coach_id (e.g. 6 random alphanumeric chars)
         $uniqueId = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 6);
         $coachData = $request->all();
         $coachData['coach_id'] = $uniqueId;
@@ -36,7 +35,7 @@ class CoachProfileController extends Controller
     public function edit($id)
     {
         $coach = Coach::findOrFail($id);
-        return view('coach.edit', compact('coach'));
+        return view('coach.editc', compact('coach'));
     }
 
     public function update(Request $request, $id)
@@ -44,6 +43,38 @@ class CoachProfileController extends Controller
         $coach = Coach::findOrFail($id);
         $coach->update($request->all());
 
-        return redirect()->route('coach.profile', $coach->id);
+        return redirect()->route('coach.profile');
+    }
+
+    public function updateStayLoggedIn(Request $request, $id)
+    {
+        $coach = Coach::findOrFail($id);
+        $coach->stay_logged_in = $request->has('stay_logged_in') ? 1 : 0;
+        $coach->save();
+        return redirect()->route('coach.profile')->with('success', 'Stay Logged In setting updated.');
+    }
+
+    public function updateProfilePic(Request $request, $id)
+    {
+        $coach = Coach::findOrFail($id);
+        if ($request->hasFile('profile_pic')) {
+            $file = $request->file('profile_pic');
+            $filename = uniqid('coach_') . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/profile_pics', $filename);
+            $coach->profile_pic = $filename;
+            $coach->save();
+        }
+        return redirect()->route('coach.edit', $coach->id)->with('success', 'Profile picture updated!');
+    }
+
+    public function destroy($id)
+    {
+        $coach = Coach::findOrFail($id);
+        // Optionally, also delete the user record if linked
+        // $user = User::where('email', $coach->email)->first();
+        // if ($user) $user->delete();
+        $coach->delete();
+        \Auth::logout();
+        return redirect('/')->with('success', 'Coach account deleted successfully.');
     }
 }
