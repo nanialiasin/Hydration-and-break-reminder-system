@@ -9,7 +9,7 @@
 <body>
     <div class="phone-shell">
         <div class="header">
-            <a href="{{ route('home') }}" class="back-button" aria-label="Go back">
+            <a href="{{ route('coach.creating') }}" class="back-button" aria-label="Go back">
                 <img src="{{ asset('images/arrow-left.svg') }}" alt="Back" width="24" height="24">
             </a>
             <h1>Create new session</h1>
@@ -71,14 +71,14 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ route('home') }}" class="btn btn-cancel">Cancel</a>
+                    <a href="{{ route('coach.creating') }}" class="btn btn-cancel">Cancel</a>
                     <button type="submit" class="btn btn-create">Create</button>
                 </div>
             </form>
         </div>
 
         <nav class="bottom-nav" aria-label="Main navigation">
-            <a href="{{ route('home') }}" class="nav-item" aria-label="Home">
+            <a href="{{ route('coach.home') }}" class="nav-item" aria-label="Home">
                 <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
             </a>
             <a href="{{ route('training') }}" class="nav-item" aria-label="Training">
