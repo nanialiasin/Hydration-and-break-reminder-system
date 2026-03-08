@@ -15,9 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('athlete_id')->unique();
             $table->string('name');
-            $table->string('sport');
+            $table->string('email')->unique();
+            $table->string('sport')->nullable();
             $table->string('status');
-            $table->string('intensity');
+            $table->string('intensity')->nullable();
+            $table->float('weight')->nullable();
+            $table->float('height')->nullable();
+            $table->float('bmi')->nullable();
+            $table->float('alert_volume')->nullable(); // hydration alert volume
+            $table->float('reminder_volume')->nullable(); // hydration reminder volume
             $table->timestamps();
         });
     }
