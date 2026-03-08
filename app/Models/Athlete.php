@@ -17,6 +17,10 @@ class Athlete extends Model
         'height',
         'bmi',
         'profile_pic', // allow mass assignment for athlete profile picture
+        'created_by_coach', // allow mass assignment for coach-created athletes
+        'alert_volume', // hydration alert volume
+        'reminder_volume', // hydration reminder volume
+        'stay_logged_in', // stay logged in switch
     ];
 
     public static function generateAthleteId()
