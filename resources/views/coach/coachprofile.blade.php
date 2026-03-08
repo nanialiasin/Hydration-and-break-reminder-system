@@ -34,6 +34,25 @@
         .switch input:checked ~ .circle {
             left: 24px;
         }
+        .btn-danger {
+            width: 200px;
+            padding: 12px;
+            border-radius: 15px;
+            border: none;
+            background-color: #f5bcbc;
+            color: #b30000;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+        }
+
+        .btn-danger + .btn-danger {
+            margin-top: 0;
+        }
+
+        .btn-danger:hover {
+            background-color: #f29c9c;
+        }
         
     </style>
 </head>
