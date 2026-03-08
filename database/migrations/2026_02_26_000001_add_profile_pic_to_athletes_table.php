@@ -4,17 +4,21 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void
+    public function up()
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->string('profile_pic')->nullable()->default('default.jpg');
-        });
+        if (!Schema::hasColumn('athletes', 'profile_pic')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->string('profile_pic')->nullable()->after('status');
+            });
+        }
     }
 
-    public function down(): void
+    public function down()
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->dropColumn('profile_pic');
-        });
+        if (Schema::hasColumn('athletes', 'profile_pic')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->dropColumn('profile_pic');
+            });
+        }
     }
 };
