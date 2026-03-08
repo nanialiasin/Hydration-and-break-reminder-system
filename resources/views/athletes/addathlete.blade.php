@@ -19,7 +19,7 @@
     ←
     </a>
 
-    <img src="{{ asset('images/hydrapulse-logo.png') }}" alt="Hydrapulse Logo" style="display:block; margin:0 auto 18px auto; width:180px; height:180px; border-radius:50%;">
+    <img src="{{ asset('images/hydrapulse-logo.svg') }}" alt="Hydrapulse Logo" style="display:block; margin:0 auto 18px auto; width:180px; height:180px; border-radius:50%;">
     <h1>Add Athlete Profile</h1>
 
     @if(session('success'))

@@ -18,7 +18,7 @@
     </a>
 
     <!-- Large Center Logo -->
-    <img src="{{ asset('images/hydrapulse-logo.png') }}" 
+    <img src="{{ asset('images/hydrapulse-logo.svg') }}" 
          alt="Hydrapulse Logo" 
          style="display:block; margin:0 auto 10px auto; width:260px; height:260px; border-radius:50%;">
 
