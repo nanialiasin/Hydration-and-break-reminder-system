@@ -114,13 +114,16 @@
 }
 
 .app-shell {
-    width: min(430px, 100%);
+    width: 100%;
+    max-width: 900px;
     min-height: min(890px, 96vh);
     background: #E9ECF5;
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .bottom-nav {
