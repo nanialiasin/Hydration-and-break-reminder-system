@@ -9,27 +9,26 @@
     </style>
 @section('content')
 <div class="container">
-    <a href="{{ url()->previous() }}" class="back-button">
-    ←
-    </a>
 
-    <img src="{{ asset('images/hydrapulse-logo.png') }}" alt="Hydrapulse Logo" style="display:block; margin:0 auto 10px auto; width:260px; height:260px; border-radius:50%;">
+    <img src="{{ asset('images/hydrapulse-logo.svg') }}" alt="Hydrapulse Logo" style="display:block; margin:0 auto 10px auto; width:260px; height:260px; border-radius:50%;">
 
     <div class="profile-card" style="margin-top: 0;">
         <h2>Create Profile</h2>
 
-        <form method="POST" action="{{ route('profile.store') }}">
+        <form method="POST" action="{{ route('athletes.store') }}">
             @csrf
 
             <!-- Name (auto filled) -->
             <input type="text" 
-                   value="{{ auth()->user() ? auth()->user()->name : '' }}" 
-                   disabled class="input-field">
+                   name="name"
+                   value="{{ isset($name) ? $name : (auth()->user() ? auth()->user()->name : '') }}" 
+                   readonly class="input-field">
 
             <!-- Email (auto filled) -->
             <input type="email" 
-                   value="{{ auth()->user() ? auth()->user()->email : '' }}" 
-                   disabled class="input-field">
+                   name="email"
+                   value="{{ isset($email) ? $email : (auth()->user() ? auth()->user()->email : '') }}" 
+                   readonly class="input-field">
 
             <!-- Weight -->
             <label>Weight (kg)</label>
