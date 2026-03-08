@@ -22,21 +22,24 @@ class AthleteProfileController extends Controller
             'intensity' => 'required|string',
         ]);
 
-        $athlete = Auth::user()->athlete;
+        // Try to get athlete by relationship, fallback to email
+        $athlete = Auth::user()->athlete ?? \App\Models\Athlete::where('email', Auth::user()->email)->first();
         if (!$athlete) {
             return redirect()->back()->with('error', 'Athlete profile not found.');
         }
 
-        AthleteProfile::updateOrCreate(
-            ['athlete_id' => $athlete->id],
-            [
-                'weight' => $request->weight,
-                'height' => $request->height,
-                'sport' => $request->sport,
-                'intensity' => $request->intensity,
-            ]
-        );
+        $weight = $request->weight;
+        $height = $request->height;
+        $bmi = $height > 0 ? round($weight / pow($height / 100, 2), 2) : null;
 
-        return redirect()->route('athlete.home')->with('success', 'Profile updated successfully.');
+        $athlete->update([
+            'weight' => $weight,
+            'height' => $height,
+            'sport' => $request->sport,
+            'intensity' => $request->intensity,
+            'bmi' => $bmi,
+        ]);
+
+        return redirect()->route('profile.athlprofile');
     }
 }
