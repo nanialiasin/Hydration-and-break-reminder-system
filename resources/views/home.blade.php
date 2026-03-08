@@ -64,7 +64,7 @@
             <a href="{{ route('history') }}" class="nav-item" aria-label="History">
                 <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
             </a>
-            <a href="#" class="nav-item" aria-label="Profile">
+            <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="nav-item" aria-label="Profile">
                 <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
             </a>
         </nav>
