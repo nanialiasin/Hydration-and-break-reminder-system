@@ -38,29 +38,35 @@ class HydrationReminderController extends Controller
     {
         $sport = (string) $request->input('sport', 'General Training');
         $intensity = (string) $request->input('intensity', 'beginner');
-
-        // Calculate total duration from dropdowns
         $totalDuration = ((int) $request->input('hours', 0) * 60) + (int) $request->input('minutes', 0);
 
         if ($totalDuration <= 0) {
             $totalDuration = 30;
         }
 
-        // Logic: Calculate the smart interval
-        $intervalMinutes = $this->hydrationService->calculateInterval(32, 74, $totalDuration);
+        // Fetch hydration settings for the selected intensity
+        $hydrationSetting = \App\Models\HydrationSetting::where('intensity', $intensity)->first();
+        $hydrationReminder = $hydrationSetting ? $hydrationSetting->hydration_reminder : 20;
+        $breakDuration = $hydrationSetting ? $hydrationSetting->break_duration : 5;
+        $breakReminder = $hydrationSetting ? $hydrationSetting->break_reminder : 15;
 
+        // Save session data
         $request->session()->put('active_session', [
             'sport' => $sport,
             'intensity' => $intensity,
             'planned_duration_minutes' => $totalDuration,
             'temperature' => 32,
             'humidity' => 74,
-            'interval_minutes' => $intervalMinutes,
+            'interval_minutes' => $hydrationReminder,
+            'break_duration' => $breakDuration,
+            'break_reminder' => $breakReminder,
         ]);
 
         // Pass everything to the session blade
         return view('session', [
-            'interval' => $intervalMinutes,
+            'interval' => $hydrationReminder,
+            'breakDuration' => $breakDuration,
+            'breakReminder' => $breakReminder,
             'totalDuration' => $totalDuration,
             'temp' => 32,
             'humidity' => 74,
@@ -71,11 +77,17 @@ class HydrationReminderController extends Controller
 
     public function showHome()
     {
-        $interval = $this->hydrationService->calculateInterval(32, 74, 60);
+        // Get intensity from session if available, default to 'beginner'
+        $intensity = session('active_session.intensity', 'beginner');
+        $hydrationSetting = \App\Models\HydrationSetting::where('intensity', $intensity)->first();
+        $interval = $hydrationSetting ? $hydrationSetting->hydration_reminder : 20;
+        $breakDuration = $hydrationSetting ? $hydrationSetting->break_duration : 5;
+        $breakReminder = $hydrationSetting ? $hydrationSetting->break_reminder : 15;
         [$dayStreak, $weeklyAvgMl] = $this->getDailyStats();
-
         return view('home', [
             'interval' => $interval,
+            'breakDuration' => $breakDuration,
+            'breakReminder' => $breakReminder,
             'temp' => 32,
             'humidity' => 74,
             'dayStreak' => $dayStreak,
