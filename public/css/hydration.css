@@ -112,3 +112,117 @@
     color: rgb(0, 0, 0);
     transform: scale(1.1);
 }
+
+.app-shell {
+    width: min(430px, 100%);
+    min-height: min(890px, 96vh);
+    background: #E9ECF5;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: black;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+}
+
+.bottom-navi {
+    background: #1d1f26;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 68px;
+    border-top: 1px solid #2a2c34;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.bottom-navi::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 4px;
+    background: #fff;
+    border-radius: 999px;
+}
+
+.navi-item {
+    color: #9ca3af;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.15s, color 0.2s;
+}
+
+.navi-item.active, .navi-item:focus {
+    background: #e0e7ef;
+    color: #222;
+}
+
+.navi-item:hover {
+    color: #2563eb;
+    background: #f3f6fa;
+}
+
+.navi-item img {
+    display: block;
+    margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+    .nav-bar {
+        padding: 8px 8px 6px 8px;
+    }
+    .navi-item {
+        padding: 4px 6px;
+    }
+}
+
+.nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    padding: 10px 32px 8px 32px;
+    max-width: 100vw;
+    border-top: 1.5px solid #e0e7ef;
+    margin: 0;
+}
+
+.edit-profile-btn {
+    background: #2563eb;
+    color: #fff;
+    padding: 8px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 12px;
+    display: inline-block;
+}
+.edit-profile-btn:hover {
+    background: #e6f0fa;
+    text-decoration: none;
+}

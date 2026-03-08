@@ -1,5 +1,5 @@
 body {
-    background: #e6f0fa;
+    background: #E9ECF5;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -81,7 +81,7 @@ button {
 }
 
 .back-button:hover {
-    background: #e1f7ff;
+    background: #E9ECF5;
     color: rgb(0, 0, 0);
     transform: scale(1.1);
 }
@@ -89,4 +89,16 @@ button {
 .success {
     color: green;
     text-align: center;
+}
+
+.remove-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: #e10600;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
 }
