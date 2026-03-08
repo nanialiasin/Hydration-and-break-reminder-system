@@ -14,9 +14,11 @@ class AthleteController extends Controller
         return view('athletes.index', compact('athletes'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('athletes.create');
+        $name = $request->input('name', Auth::user() ? Auth::user()->name : '');
+        $email = $request->input('email', Auth::user() ? Auth::user()->email : '');
+        return view('athletes.create', compact('name', 'email'));
     }
 
     public function fetch($athlete_id)
@@ -35,27 +37,79 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
+        }
+        // Check if athlete profile already exists for this user
+        $existing = Athlete::where('email', $user->email)->first();
+        if ($existing) {
+            // Redirect to existing profile
+            return redirect()->route('profile.athlprofile', ['athlete_id' => $existing->athlete_id]);
+        }
         $request->validate([
-            'athlete_id' => 'required|unique:athletes',
             'name' => 'required',
             'sport' => 'required',
-            'status' => 'required',
-            'intensity' => 'required',
+            'weight' => 'required|numeric',
+            'height' => 'required|numeric',
+            'training_intensity' => 'required',
         ]);
-
-        Athlete::create($request->all());
-        return redirect()->back()->with('success', 'Athlete added successfully.');
+        // Use Athlete model's ID generation for consistency
+        $athlete = Athlete::create([
+            'athlete_id' => Athlete::generateAthleteId(),
+            'name' => $request->name,
+            'email' => $user->email,
+            'sport' => $request->sport,
+            'weight' => $request->weight,
+            'height' => $request->height,
+            'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
+            'intensity' => $request->training_intensity,
+            'status' => 'active',
+        ]);
+        return redirect()->route('profile.athlprofile', [
+            'athlete_id' => $athlete->athlete_id,
+            'name' => $request->name,
+            'email' => $user->email,
+            'weight' => $request->weight,
+            'height' => $request->height,
+            'sport' => $request->sport,
+            'training_intensity' => $request->training_intensity
+        ]);
     }
 
-    public function edit()
+    public function removePage()
     {
-        $athlete = Auth::user();
+        return view('athletes.remove');
+    }
+
+    public function destroyById(Request $request)
+    {
+        $athlete = Athlete::where('athlete_id', $request->athlete_id)->first();
+
+        if (!$athlete) {
+            return back()->with('success', 'Athlete not found.');
+        }
+
+        $athlete->delete();
+
+        return back()->with('success', 'Athlete removed successfully.');
+    }
+
+    public function edit($athlete_id)
+    {
+        $athlete = Athlete::where('athlete_id', $athlete_id)->first();
+        if (!$athlete) {
+            return redirect()->route('profile.create')->with('error', 'Athlete profile not found.');
+        }
         return view('profile.editprofile', compact('athlete'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $athlete_id)
     {
-        $athlete = Auth::user();
+        $athlete = Athlete::where('athlete_id', $athlete_id)->first();
+        if (!$athlete) {
+            return redirect()->route('profile.create')->with('error', 'Athlete profile not found.');
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -82,7 +136,7 @@ class AthleteController extends Controller
             $hydrationSetting->save();
         }
 
-        return redirect()->route('profile.athlprofile')->with('success', 'Profile updated successfully.');
+        return redirect()->route('profile.athlprofile', ['athlete_id' => $athlete->athlete_id])->with('success', 'Profile updated successfully.');
     }
 
     public function updateProfilePic(Request $request)
@@ -125,5 +179,39 @@ class AthleteController extends Controller
             $hydrationSetting->save();
         }
         return redirect()->back()->with('success', 'Hydration settings updated successfully.');
+    }
+
+    public function stayLoggedIn(Request $request)
+    {
+        $athlete = Athlete::where('email', Auth::user()->email)->first();
+        if (!$athlete) {
+            return response()->json(['success' => false, 'message' => 'Athlete profile not found.'], 404);
+        }
+        $athlete->stay_logged_in = $request->input('stay_logged_in', false);
+        $athlete->save();
+        return response()->json(['success' => true, 'stay_logged_in' => $athlete->stay_logged_in]);
+    }
+
+    public function show($athlete_id, Request $request)
+    {
+        $athlete = Athlete::where('athlete_id', $athlete_id)->first();
+        // Fallback: if model is missing or fields are empty, use request/query data
+        $weight = $athlete?->weight ?? $request->get('weight');
+        $height = $athlete?->height ?? $request->get('height');
+        $bmi = $athlete?->bmi;
+        if (!$bmi && $weight && $height) {
+            $bmi = round($weight / pow($height / 100, 2), 2);
+        }
+        $data = [
+            'athlete' => $athlete,
+            'name' => $athlete?->name ?? $request->get('name'),
+            'email' => $athlete?->email ?? $request->get('email'),
+            'weight' => $weight,
+            'height' => $height,
+            'bmi' => $bmi,
+            'sport' => $athlete?->sport ?? $request->get('sport'),
+            'training_intensity' => $athlete?->intensity ?? $request->get('training_intensity'),
+        ];
+        return view('profile.athlprofile', $data);
     }
 }
