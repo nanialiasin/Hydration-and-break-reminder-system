@@ -39,7 +39,7 @@
 </head>
 <body style="background-color: #e9ecf5;">
 <main class="app-shell" role="main">
-    <div class="container" style="max-width:430px;margin:0 auto;padding:0;">
+    <div class="container" style="max-width:430px;margin:0 auto;padding:0;margin-bottom:80px;">
         <div class="profile-title" style="font-size:28px;font-weight:bold;margin-bottom:20px;text-align:left;margin-left:0;">Profile</div>
         <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);padding:24px 28px;margin-bottom:24px;background:#fff;position:relative;">
             <div class="athlete-avatar mb-2" style="margin-bottom: 18px;display:flex;justify-content:center;">
@@ -50,13 +50,13 @@
             </div>
             <hr style="border:none; border-top:1.5px solid #e9ecf5; margin-bottom:18px; margin-top:0;">
             <div style="font-size:16px;line-height:1.7;color:#222;">
-                <p><strong>Name:</strong> {{ $athlete?->name }}</p>
-                <p><strong>Email:</strong> {{ $athlete?->email }}</p>
-                <p><strong>Weight (kg):</strong> {{ $athlete?->weight }}</p>
-                <p><strong>Height (cm):</strong> {{ $athlete?->height }}</p>
-                <p><strong>BMI:</strong> {{ $athlete?->bmi }}</p>
-                <p><strong>Sport:</strong> {{ $athlete?->sport }}</p>
-                <p><strong>Training Intensity:</strong> {{ $athlete?->intensity }}</p>
+                <p><strong>Name:</strong> {{ $athlete?->name ?? ($name ?? '') }}</p>
+                <p><strong>Email:</strong> {{ $athlete?->email ?? ($email ?? '') }}</p>
+                <p><strong>Weight (kg):</strong> {{ $athlete?->weight ?? (isset($weight) ? $weight : '') }}</p>
+                <p><strong>Height (cm):</strong> {{ $athlete?->height ?? (isset($height) ? $height : '') }}</p>
+                <p><strong>BMI:</strong> {{ $athlete?->bmi ?? ((isset($weight) && isset($height)) ? round($weight / pow($height / 100, 2), 2) : '') }}</p>
+                <p><strong>Sport:</strong> {{ $athlete?->sport ?? ($sport ?? '') }}</p>
+                <p><strong>Training Intensity:</strong> {{ $athlete?->intensity ?? ($training_intensity ?? '') }}</p>
                 <p><strong>Status:</strong> <span class="status-active">Active</span></p>
             </div>
             <div class="edit-profile-btn" style="text-align:right;margin-top:0;margin-bottom:-12px;position:absolute;bottom:24px;right:28px;">
@@ -85,28 +85,23 @@
                 @csrf
                 <button class="btn-danger" style="background:#f5bcbc;color:#b30000;padding:8px 18px;border-radius:8px;border:none;font-weight:500;">Log Out</button>
             </form>
-            <form method="POST" action="{{ route('profile.delete') }}">
-                @csrf
-                @method('DELETE')
+            <form method="GET" action="{{ route('profile.delete.confirm') }}">
                 <button class="btn-danger" style="background:#f5bcbc;color:#b30000;padding:8px 18px;border-radius:8px;border:none;font-weight:500;">Delete Account</button>
             </form>
         </div>
     </div>
 </main>
 <nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
-    <a href="{{ route('coach.home') }}" class="navi-item" aria-label="Home">
+    <a href="{{ route('home') }}" class="navi-item" aria-label="Home">
         <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
     </a>
-    <a href="{{ route('hydration.index') }}" class="navi-item" aria-label="Hydration">
-        <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
+    <a href="{{ route('training') }}" class="navi-item" aria-label="Training">
+        <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
     </a>
-    <a href="{{ route('coach.creating') }}" class="navi-item" aria-label="Create">
-        <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
-    </a>
-    <a href="#" class="navi-item active" aria-label="History">
+    <a href="{{ route('history') }}" class="navi-item active" aria-label="History">
         <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
     </a>
-    <a href="{{ route('coach.profile') }}" class="navi-item" aria-label="Profile">
+    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="navi-item" aria-label="Profile">
         <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
     </a>
 </nav>
