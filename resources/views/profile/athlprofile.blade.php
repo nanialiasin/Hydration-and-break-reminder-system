@@ -57,7 +57,13 @@
                 <p><strong>BMI:</strong> {{ $athlete?->bmi ?? ((isset($weight) && isset($height)) ? round($weight / pow($height / 100, 2), 2) : '') }}</p>
                 <p><strong>Sport:</strong> {{ $athlete?->sport ?? ($sport ?? '') }}</p>
                 <p><strong>Training Intensity:</strong> {{ $athlete?->intensity ?? ($training_intensity ?? '') }}</p>
-                <p><strong>Status:</strong> <span class="status-active">Active</span></p>
+                <p><strong>Status:</strong> 
+                    @if(($athlete?->status ?? $status ?? 'active') === 'inactive')
+                        <span class="status-inactive">Inactive</span>
+                    @else
+                        <span class="status-active">Active</span>
+                    @endif
+                </p>
             </div>
             <div class="edit-profile-btn" style="text-align:right;margin-top:0;margin-bottom:-12px;position:absolute;bottom:24px;right:28px;">
                 <a href="{{ route('profile.editprofile', $athlete?->athlete_id) }}" class="edit-profile-btn mt-3" style="text-decoration:none;">Edit</a>
@@ -98,10 +104,10 @@
     <a href="{{ route('training') }}" class="navi-item" aria-label="Training">
         <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
     </a>
-    <a href="{{ route('history') }}" class="navi-item active" aria-label="History">
+    <a href="{{ route('history') }}" class="navi-item" aria-label="History">
         <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
     </a>
-    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="navi-item" aria-label="Profile">
+    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="navi-item active" aria-label="Profile">
         <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
     </a>
 </nav>

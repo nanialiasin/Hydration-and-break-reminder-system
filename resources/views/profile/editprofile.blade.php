@@ -40,6 +40,13 @@
                     <input type="number" name="height" value="{{ old('height', $athlete?->height ?? Auth::user()->height ?? '') }}" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
                 </div>
                 <div class="input-group">
+                    <label>Status</label>
+                    <select name="status" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+                        <option value="active" {{ (old('status', $athlete?->status ?? 'active') == 'active') ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ (old('status', $athlete?->status ?? '') == 'inactive') ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+                <div class="input-group">
                     <label class="mb-3">Training Intensity</label>
                     <div class="intensity-group d-flex justify-content-center gap-5">
                         <div class="d-flex flex-column align-items-center mx-3">
