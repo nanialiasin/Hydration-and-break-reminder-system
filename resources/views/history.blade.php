@@ -62,9 +62,15 @@
             <a href="{{ route('history') }}" class="nav-item active" aria-label="History">
                 <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
             </a>
-            <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="nav-item" aria-label="Profile">
-                <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
-            </a>
+            @if(isset($athlete) && $athlete?->athlete_id)
+                <a href="{{ route('profile.athlprofile', $athlete->athlete_id) }}" class="nav-item" aria-label="Profile">
+                    <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+                </a>
+            @else
+                <a href="#" class="nav-item disabled" aria-label="Profile" style="pointer-events:none;opacity:0.5;">
+                    <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+                </a>
+            @endif
         </nav>
     </main>
 </body>
