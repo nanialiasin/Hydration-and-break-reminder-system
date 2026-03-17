@@ -65,6 +65,7 @@ class AthleteController extends Controller
             'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
             'intensity' => $request->training_intensity,
             'status' => 'active',
+            'created_by_coach' => $request->created_by_coach ?? null,
         ]);
         return redirect()->route('profile.athlprofile', [
             'athlete_id' => $athlete->athlete_id,
@@ -126,6 +127,7 @@ class AthleteController extends Controller
             'weight' => $request->weight,
             'height' => $request->height,
             'intensity' => $request->intensity,
+            'status' => $request->status, 
             'bmi' => round($bmi, 1),
         ]);
 
@@ -195,20 +197,16 @@ class AthleteController extends Controller
     public function show($athlete_id, Request $request)
     {
         $athlete = Athlete::where('athlete_id', $athlete_id)->first();
-        // Fallback: if model is missing or fields are empty, use request/query data
-        $weight = $athlete?->weight ?? $request->get('weight');
-        $height = $athlete?->height ?? $request->get('height');
-        $bmi = $athlete?->bmi;
-        if (!$bmi && $weight && $height) {
-            $bmi = round($weight / pow($height / 100, 2), 2);
-        }
+        // Only use query/request data if the athlete model is missing (e.g., just created and not yet saved)
         $data = [
             'athlete' => $athlete,
             'name' => $athlete?->name ?? $request->get('name'),
             'email' => $athlete?->email ?? $request->get('email'),
-            'weight' => $weight,
-            'height' => $height,
-            'bmi' => $bmi,
+            'weight' => $athlete?->weight ?? $request->get('weight'),
+            'height' => $athlete?->height ?? $request->get('height'),
+            'bmi' => $athlete?->bmi ?? ((($athlete?->weight ?? $request->get('weight')) && ($athlete?->height ?? $request->get('height')))
+                ? round(($athlete?->weight ?? $request->get('weight')) / pow(($athlete?->height ?? $request->get('height')) / 100, 2), 2)
+                : null),
             'sport' => $athlete?->sport ?? $request->get('sport'),
             'training_intensity' => $athlete?->intensity ?? $request->get('training_intensity'),
         ];
