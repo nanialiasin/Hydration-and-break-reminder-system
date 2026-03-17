@@ -47,13 +47,13 @@
     <a href="{{ route('coach.home') }}" class="navi-item" aria-label="Home">
         <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
     </a>
-    <a href="{{ route('hydration.index') }}" class="navi-item" aria-label="Hydration">
+    <a href="{{ route('hydration.index') }}" class="navi-item active" aria-label="Hydration">
         <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
     </a>
     <a href="{{ route('coach.creating') }}" class="navi-item" aria-label="Create">
         <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
     </a>
-    <a href="#" class="navi-item active" aria-label="History">
+    <a href="{{ route('coach.chistory') }}" class="navi-item" aria-label="History">
         <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
     </a>
     <a href="{{ route('coach.profile') }}" class="navi-item" aria-label="Profile">

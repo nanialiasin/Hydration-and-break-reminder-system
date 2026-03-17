@@ -64,7 +64,7 @@
         <a href="{{ route('coach.creating') }}" class="navi-item active" aria-label="Create">
             <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
         </a>
-        <a href="#" class="navi-item active" aria-label="History">
+        <a href="{{ route('coach.chistory') }}" class="navi-item" aria-label="History">
             <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
         </a>
         <a href="{{ route('coach.profile') }}" class="navi-item" aria-label="Profile">
