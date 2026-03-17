@@ -15,7 +15,7 @@
 
 <div class="container">
 
-    <a href="{{ url()->previous() }}" class="back-button">
+    <a href="{{ route('coach.creating') }}" class="back-button">
     ←
     </a>
 
@@ -26,17 +26,17 @@
         <p class="success">{{ session('success') }}</p>
     @endif
 
-    <form method="POST" action="{{ route('athletes.store') }}">
+    <form method="POST" action="{{ route('coach.addathlete.store') }}">
         @csrf
-
+        <input type="hidden" name="created_by_coach" value="{{ Auth::check() ? Auth::user()->id : '' }}">
         <input type="text" name="athlete_id" placeholder="Athlete ID">
 
         <div class="card">
             <div style="font-weight:600; margin-bottom:8px;">Athlete Data</div>
-            <input type="text" name="name" placeholder="Name :" readonly>
-            <input type="text" name="sport" placeholder="Sport :" readonly>
-            <input type="text" name="training_intensity" placeholder="Training Intensity :" readonly>
-            <input type="text" name="status" placeholder="Status :" readonly>
+            <input type="text" name="name" placeholder="Name :" id="athleteName">
+            <input type="text" name="sport" placeholder="Sport :" id="athleteSport">
+            <input type="text" name="training_intensity" placeholder="Training Intensity :" id="athleteIntensity">
+            <input type="text" name="status" placeholder="Status :" id="athleteStatus">
         </div>
 
         <button type="submit">Confirm Add</button>
@@ -57,18 +57,18 @@ document.querySelector('input[name="athlete_id"]').addEventListener('blur', func
         })
         .then(data => {
             if (data) {
-                document.querySelector('input[name="name"]').value = data.name || '';
-                document.querySelector('input[name="sport"]').value = data.sport || '';
-                document.querySelector('input[name="training_intensity"]').value = data.training_intensity || '';
-                document.querySelector('input[name="status"]').value = data.status || '';
+                document.getElementById('athleteName').value = data.name || '';
+                document.getElementById('athleteSport').value = data.sport || '';
+                document.getElementById('athleteIntensity').value = data.intensity || '';
+                document.getElementById('athleteStatus').value = data.status || '';
             }
         })
         .catch(() => {
             // Optionally clear fields if not found
-            document.querySelector('input[name="name"]').value = '';
-            document.querySelector('input[name="sport"]').value = '';
-            document.querySelector('input[name="training_intensity"]').value = '';
-            document.querySelector('input[name="status"]').value = '';
+            document.getElementById('athleteName').value = '';
+            document.getElementById('athleteSport').value = '';
+            document.getElementById('athleteIntensity').value = '';
+            document.getElementById('athleteStatus').value = '';
         });
 });
 </script>
