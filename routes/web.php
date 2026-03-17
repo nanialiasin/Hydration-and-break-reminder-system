@@ -218,7 +218,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/coach/delete/{id}', [CoachProfileController::class, 'destroy'])->name('coach.delete');
     Route::post('/coach/stayloggedin/{id}', [CoachProfileController::class, 'updateStayLoggedIn'])->name('coach.stayloggedin');
     Route::post('/coach/update-pic/{id}', [App\Http\Controllers\CoachProfileController::class, 'updateProfilePic'])->name('coach.updatePic');
+    Route::post('/coach/addathlete', [App\Http\Controllers\CoachDashboardController::class, 'storeAthlete'])
+        ->name('coach.addathlete.store');
 });
+
+Route::get('/coach/history', [CoachController::class, 'history'])->name('coach.chistory');
 
 Route::delete('/profile/delete', function () {
     $user = Auth::user();
