@@ -18,7 +18,11 @@ class AthleteController extends Controller
     {
         $name = $request->input('name', Auth::user() ? Auth::user()->name : '');
         $email = $request->input('email', Auth::user() ? Auth::user()->email : '');
-        return view('athletes.create', compact('name', 'email'));
+        $weight = $request->input('weight', Auth::user()->weight ?? '');
+        $height = $request->input('height', Auth::user()->height ?? '');
+        $sport = $request->input('sport', Auth::user()->sport ?? '');
+        $training_intensity = $request->input('training_intensity', Auth::user()->training_intensity ?? '');
+        return view('profile.createprofile', compact('name', 'email', 'weight', 'height', 'sport', 'training_intensity'));
     }
 
     public function fetch($athlete_id)
@@ -56,6 +60,7 @@ class AthleteController extends Controller
         ]);
         // Use Athlete model's ID generation for consistency
         $athlete = Athlete::create([
+            'user_id' => $user->id,
             'athlete_id' => Athlete::generateAthleteId(),
             'name' => $request->name,
             'email' => $user->email,
@@ -68,16 +73,10 @@ class AthleteController extends Controller
             'created_by_coach' => $request->created_by_coach ?? null,
         ]);
         return redirect()->route('profile.athlprofile', [
-            'athlete_id' => $athlete->athlete_id,
-            'name' => $request->name,
-            'email' => $user->email,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'sport' => $request->sport,
-            'training_intensity' => $request->training_intensity
+            'athlete_id' => $athlete->athlete_id
         ]);
     }
-
+    
     public function removePage()
     {
         return view('athletes.remove');
