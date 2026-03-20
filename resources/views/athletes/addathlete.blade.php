@@ -26,6 +26,16 @@
         <p class="success">{{ session('success') }}</p>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:16px;">
+            <ul style="margin:0; padding-left:18px;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('coach.addathlete.store') }}">
         @csrf
         <input type="hidden" name="created_by_coach" value="{{ Auth::check() ? Auth::user()->id : '' }}">
