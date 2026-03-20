@@ -38,6 +38,17 @@
     </style>
 </head>
 <body style="background-color: #e9ecf5;">
+@if(!$athlete)
+    <main class="app-shell" role="main">
+        <div class="container" style="max-width:430px;margin:0 auto;padding:0;margin-bottom:80px;">
+            <div class="profile-title" style="font-size:28px;font-weight:bold;margin-bottom:20px;text-align:left;margin-left:0;">Profile</div>
+            <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);padding:24px 28px;margin-bottom:24px;background:#fff;position:relative;text-align:center;">
+                <h4>You have not created a profile yet.</h4>
+                <a href="{{ route('athletes.create') }}" class="btn btn-dark" style="margin-top:18px;">Create Profile</a>
+            </div>
+        </div>
+    </main>
+@else
 <main class="app-shell" role="main">
     <div class="container" style="max-width:430px;margin:0 auto;padding:0;margin-bottom:80px;">
         <div class="profile-title" style="font-size:28px;font-weight:bold;margin-bottom:20px;text-align:left;margin-left:0;">Profile</div>
@@ -56,7 +67,7 @@
                 <p><strong>Height (cm):</strong> {{ $athlete?->height ?? (isset($height) ? $height : '') }}</p>
                 <p><strong>BMI:</strong> {{ $athlete?->bmi ?? ((isset($weight) && isset($height)) ? round($weight / pow($height / 100, 2), 2) : '') }}</p>
                 <p><strong>Sport:</strong> {{ $athlete?->sport ?? ($sport ?? '') }}</p>
-                <p><strong>Training Intensity:</strong> {{ $athlete?->intensity ?? ($training_intensity ?? '') }}</p>
+                <p><strong>Training Intensity:</strong> {{ $athlete?->training_intensity ?? $athlete?->intensity ?? ($training_intensity ?? '') }}</p>
                 <p><strong>Status:</strong> 
                     @if(($athlete?->status ?? $status ?? 'active') === 'inactive')
                         <span class="status-inactive">Inactive</span>
@@ -97,6 +108,7 @@
         </div>
     </div>
 </main>
+@endif
 <nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
     <a href="{{ route('home') }}" class="navi-item" aria-label="Home">
         <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
