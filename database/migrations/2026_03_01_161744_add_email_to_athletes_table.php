@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->string('email')->unique()->after('name');
-        });
+        if (!Schema::hasColumn('athletes', 'email')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->string('email')->unique()->after('name');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->dropColumn('email');
-        });
+        if (Schema::hasColumn('athletes', 'email')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->dropColumn('email');
+            });
+        }
     }
 };

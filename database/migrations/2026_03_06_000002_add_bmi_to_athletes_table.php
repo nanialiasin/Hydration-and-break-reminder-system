@@ -6,15 +6,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->float('bmi')->nullable();
-        });
+        if (!Schema::hasColumn('athletes', 'bmi')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->float('bmi')->nullable();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->dropColumn('bmi');
-        });
+        if (Schema::hasColumn('athletes', 'bmi')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->dropColumn('bmi');
+            });
+        }
     }
 };

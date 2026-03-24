@@ -6,15 +6,19 @@ use Illuminate\Support\Facades\Schema;
 class AddCreatedByCoachToAthletesTable extends Migration {
     public function up(): void
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->string('created_by_coach')->nullable();
-        });
+        if (!Schema::hasColumn('athletes', 'created_by_coach')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->string('created_by_coach')->nullable();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('athletes', function (Blueprint $table) {
-            $table->dropColumn('created_by_coach');
-        });
+        if (Schema::hasColumn('athletes', 'created_by_coach')) {
+            Schema::table('athletes', function (Blueprint $table) {
+                $table->dropColumn('created_by_coach');
+            });
+        }
     }
 }
