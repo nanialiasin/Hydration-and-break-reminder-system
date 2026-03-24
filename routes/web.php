@@ -242,3 +242,9 @@ Route::delete('/profile/delete', function () {
 Route::get('/profile/delete/confirm', function () {
     return view('profile.delete');
 })->name('profile.delete.confirm');
+
+Route::match(['get', 'post'], '/sensor/ingest', [HydrationReminderController::class, 'ingestSensorReading'])
+    ->name('sensor.ingest');
+
+Route::get('/sensor/latest', [HydrationReminderController::class, 'latestSensorReading'])
+    ->name('sensor.latest');

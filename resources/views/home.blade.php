@@ -14,11 +14,11 @@
             <section class="stats-card">
                 <div class="stat-row">
                     <span class="stat-label">Temperature</span>
-                    <span class="stat-value">{{ $temp ?? 32 }}°C</span>
+                    <span id="temperatureValue" class="stat-value">{{ $temp ?? 32 }}°C</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Humidity</span>
-                    <span class="stat-value">{{ $humidity ?? 74 }}%</span>
+                    <span id="humidityValue" class="stat-value">{{ $humidity ?? 74 }}%</span>
                 </div>
             </section>
 
@@ -71,16 +71,76 @@
     </main>
 
     <script>
+        // --- Timer configuration ---
         const totalMinutes = {{ $interval ?? 12 }};
         const intervalSeconds = totalMinutes * 60;
         let totalSeconds = intervalSeconds;
         let didExpire = false;
 
+        // --- DOM references for timer UI ---
         const countdownElement = document.getElementById('homeCountdown');
         const ringProgress = document.getElementById('ringProgress');
         const drinkButton = document.querySelector('.drink-btn');
         const circumference = 534; 
+        const temperatureValueElement = document.getElementById('temperatureValue');
+        const humidityValueElement = document.getElementById('humidityValue');
+        const sensorLatestUrl = "{{ route('sensor.latest') }}";
+        let lastSensorState = null;
 
+        // --- Log sensor state changes in DevTools console only ---
+        function setSensorState(isOnline, updatedAtText) {
+            if (lastSensorState === isOnline) {
+                return;
+            }
+
+            lastSensorState = isOnline;
+
+            if (isOnline) {
+                console.info(`[Sensor] Online. ${updatedAtText}`);
+                return;
+            }
+
+            console.warn(`[Sensor] Offline. ${updatedAtText}`);
+        }
+
+        // --- Poll latest sensor values and refresh cards ---
+        async function refreshSensorValues() {
+            try {
+                const response = await fetch(sensorLatestUrl, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store',
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Sensor endpoint returned ${response.status}`);
+                }
+
+                const payload = await response.json();
+                const temperature = Number(payload.temperature);
+                const humidity = Number(payload.humidity);
+                const source = String(payload.source ?? 'fallback');
+
+                if (Number.isFinite(temperature)) {
+                    temperatureValueElement.textContent = `${temperature.toFixed(1)}°C`;
+                }
+
+                if (Number.isFinite(humidity)) {
+                    humidityValueElement.textContent = `${humidity.toFixed(1)}%`;
+                }
+
+                const isOnline = source === 'sensor';
+                const updatedAt = payload.updated_at
+                    ? `Updated ${payload.updated_at}`
+                    : (isOnline ? 'Live sensor feed' : 'Using fallback values');
+
+                setSensorState(isOnline, updatedAt);
+            } catch (error) {
+                setSensorState(false, 'Unable to reach sensor endpoint');
+            }
+        }
+
+        // --- Render countdown text and ring progress ---
         function renderTimer() {
             const mins = Math.floor(totalSeconds / 60);
             const secs = totalSeconds % 60;
@@ -91,28 +151,36 @@
             ringProgress.style.strokeDashoffset = offset;
         }
 
+        // --- Reset timer when user drinks now ---
         function resetTimer() {
             totalSeconds = intervalSeconds;
             didExpire = false;
             renderTimer();
         }
 
+        // --- Tick timer and show hydration reminder at zero ---
         function updateTimer() {
             if (totalSeconds > 0) {
                 totalSeconds--;
                 renderTimer();
             }
 
+            // Reminder pop-up
             if (totalSeconds <= 0 && !didExpire) {
                 didExpire = true;
                 alert("Reminder: Time to hydrate!");
             }
         }
 
+        // --- Bind actions and start timer loop ---
         drinkButton.addEventListener('click', resetTimer);
 
         const timerInterval = setInterval(updateTimer, 1000);
         renderTimer();
+
+        // --- Start live sensor polling ---
+        refreshSensorValues();
+        const sensorPollingInterval = setInterval(refreshSensorValues, 1000);
     </script>
 </body>
 </html>
