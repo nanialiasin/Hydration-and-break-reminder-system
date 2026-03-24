@@ -15,7 +15,7 @@
 
 <div class="container">
 
-    <a href="{{ url()->previous() }}" class="back-button">
+    <a href="{{ route('coach.creating') }}" class="back-button">
     ←
     </a>
 
@@ -26,10 +26,22 @@
         <p class="success">{{ session('success') }}</p>
     @endif
 
-    <form method="POST" action="{{ route('athletes.store') }}">
+    @if(session('error'))
+        <p class="success" style="background:#fee2e2;color:#991b1b;">{{ session('error') }}</p>
+    @endif
+
+    @if($errors->any())
+        <div class="success" style="background:#fee2e2;color:#991b1b;text-align:left;">
+            @foreach($errors->all() as $error)
+                <p style="margin:4px 0;">{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('athletes.add.byid') }}">
         @csrf
 
-        <input type="text" name="athlete_id" placeholder="Athlete ID">
+        <input type="text" name="athlete_id" placeholder="Athlete ID" required>
 
         <div class="card">
             <div style="font-weight:600; margin-bottom:8px;">Athlete Data</div>

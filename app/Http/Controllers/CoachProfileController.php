@@ -14,10 +14,35 @@ class CoachProfileController extends Controller
 
     public function store(Request $request)
     {
-        $uniqueId = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 6);
-        $coachData = $request->all();
-        $coachData['coach_id'] = $uniqueId;
-        $coach = Coach::create($coachData);
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create a coach profile.');
+        }
+
+        // Check if coach profile already exists for this user
+        $existing = Coach::where('email', $user->email)->first();
+        if ($existing) {
+            // Redirect to existing profile
+            return redirect()->route('coach.profile');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sport' => 'required|string',
+            'phone_number' => 'required|string',
+            'team_name' => 'required|string',
+        ]);
+
+        // Create coach profile with authenticated user's email
+        $coach = Coach::create([
+            'coach_id' => Coach::generateCoachId(),
+            'name' => $validated['name'],
+            'email' => $user->email,
+            'sport' => $validated['sport'],
+            'phone_number' => $validated['phone_number'],
+            'team_name' => $validated['team_name'],
+        ]);
+
         return redirect()->route('coach.profile');
     }
 
@@ -70,11 +95,19 @@ class CoachProfileController extends Controller
     public function destroy($id)
     {
         $coach = Coach::findOrFail($id);
-        // Optionally, also delete the user record if linked
-        // $user = User::where('email', $coach->email)->first();
-        // if ($user) $user->delete();
-        $coach->delete();
+        $user = \App\Models\User::where('email', $coach->email)->first();
+
+        // Logout before deletion
         \Auth::logout();
-        return redirect('/')->with('success', 'Coach account deleted successfully.');
+
+        // Delete the coach and all related data (cascades through model)
+        $coach->delete();
+
+        // Delete the associated user account
+        if ($user) {
+            $user->delete();
+        }
+
+        return redirect('/')->with('success', 'Coach account and all associated data have been permanently deleted.');
     }
 }

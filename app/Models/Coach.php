@@ -32,5 +32,16 @@ class Coach extends Model
                 $coach->coach_id = self::generateCoachId();
             }
         });
+
+        // Cascade delete all related data when coach is deleted
+        static::deleting(function ($coach) {
+            // Get all athletes created by this coach
+            $athletes = Athlete::where('created_by_coach', $coach->coach_id)->get();
+            
+            // Delete each athlete and their related data (cascades through Athlete model)
+            foreach ($athletes as $athlete) {
+                $athlete->delete();
+            }
+        });
     }
 }

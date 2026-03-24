@@ -16,11 +16,11 @@ class Athlete extends Model
         'weight',
         'height',
         'bmi',
-        'profile_pic', // allow mass assignment for athlete profile picture
-        'created_by_coach', // allow mass assignment for coach-created athletes
-        'alert_volume', // hydration alert volume
-        'reminder_volume', // hydration reminder volume
-        'stay_logged_in', // stay logged in switch
+        'profile_pic',
+        'created_by_coach',
+        'alert_volume',
+        'reminder_volume',
+        'stay_logged_in',
     ];
 
     public static function generateAthleteId()
@@ -34,10 +34,18 @@ class Athlete extends Model
     {
         parent::boot();
         static::creating(function ($athlete) {
-            // Only generate if athlete_id is not set or does not match the required format
             if (empty($athlete->athlete_id) || !preg_match('/^A[A-Z]{2}\d{3}$/', $athlete->athlete_id)) {
                 $athlete->athlete_id = self::generateAthleteId();
             }
+        });
+
+        // Cascade delete all related data when athlete is deleted
+        static::deleting(function ($athlete) {
+            // Delete athlete profiles
+            $athlete->profile()->delete();
+            
+            // Delete hydration settings for this athlete
+            \App\Models\HydrationSetting::where('athlete_id', $athlete->athlete_id)->delete();
         });
     }
 

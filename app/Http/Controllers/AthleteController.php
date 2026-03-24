@@ -29,10 +29,39 @@ class AthleteController extends Controller
                 'name' => $athlete->name,
                 'sport' => $athlete->sport,
                 'intensity' => $athlete->intensity,
+                'training_intensity' => $athlete->intensity,
                 'status' => $athlete->status,
             ]);
         }
         return response()->json(null, 404);
+    }
+
+    public function addById(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in as a coach.');
+        }
+
+        $validated = $request->validate([
+            'athlete_id' => 'required|string',
+        ]);
+
+        $athlete = Athlete::where('athlete_id', $validated['athlete_id'])->first();
+
+        if (!$athlete) {
+            return back()->with('error', 'Athlete ID not found.');
+        }
+
+        $coachId = (string) $user->id;
+        if ((string) $athlete->created_by_coach === $coachId) {
+            return back()->with('success', 'Athlete is already in your team.');
+        }
+
+        $athlete->created_by_coach = $coachId;
+        $athlete->save();
+
+        return back()->with('success', 'Athlete added to your team successfully.');
     }
 
     public function store(Request $request)
@@ -41,39 +70,46 @@ class AthleteController extends Controller
         if (!$user) {
             return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
         }
-        // Check if athlete profile already exists for this user
-        $existing = Athlete::where('email', $user->email)->first();
-        if ($existing) {
-            // Redirect to existing profile
-            return redirect()->route('profile.athlprofile', ['athlete_id' => $existing->athlete_id]);
-        }
-        $request->validate([
+
+        $validated = $request->validate([
             'name' => 'required',
             'sport' => 'required',
-            'weight' => 'required|numeric',
-            'height' => 'required|numeric',
+            'weight' => 'required|numeric|min:1',
+            'height' => 'required|numeric|min:1',
             'training_intensity' => 'required',
         ]);
-        // Use Athlete model's ID generation for consistency
-        $athlete = Athlete::create([
-            'athlete_id' => Athlete::generateAthleteId(),
-            'name' => $request->name,
-            'email' => $user->email,
-            'sport' => $request->sport,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
-            'intensity' => $request->training_intensity,
-            'status' => 'active',
-        ]);
+        
+        // Calculate BMI
+        $bmi = round($validated['weight'] / pow($validated['height'] / 100, 2), 2);
+
+        // Create a new athlete profile or update the existing one for this email.
+        $athlete = Athlete::firstOrNew(['email' => $user->email]);
+
+        if (empty($athlete->athlete_id)) {
+            $athlete->athlete_id = Athlete::generateAthleteId();
+        }
+
+        $athlete->name = $validated['name'];
+        $athlete->email = $user->email;
+        $athlete->sport = $validated['sport'];
+        $athlete->weight = (float) $validated['weight'];
+        $athlete->height = (float) $validated['height'];
+        $athlete->bmi = $bmi;
+        $athlete->intensity = $validated['training_intensity'];
+        $athlete->status = $athlete->status ?: 'active';
+        $athlete->save();
+        
+        // Refresh the athlete to ensure all data is loaded
+        $athlete->refresh();
+        
         return redirect()->route('profile.athlprofile', [
             'athlete_id' => $athlete->athlete_id,
-            'name' => $request->name,
-            'email' => $user->email,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'sport' => $request->sport,
-            'training_intensity' => $request->training_intensity
+            'name' => $athlete->name,
+            'email' => $athlete->email,
+            'weight' => $athlete->weight,
+            'height' => $athlete->height,
+            'sport' => $athlete->sport,
+            'training_intensity' => $athlete->intensity
         ]);
     }
 
@@ -87,12 +123,13 @@ class AthleteController extends Controller
         $athlete = Athlete::where('athlete_id', $request->athlete_id)->first();
 
         if (!$athlete) {
-            return back()->with('success', 'Athlete not found.');
+            return back()->with('error', 'Athlete not found.');
         }
 
+        // Delete athlete and all related data (cascades through model)
         $athlete->delete();
 
-        return back()->with('success', 'Athlete removed successfully.');
+        return back()->with('success', 'Athlete and all associated data removed successfully.');
     }
 
     public function edit($athlete_id)
@@ -195,22 +232,31 @@ class AthleteController extends Controller
     public function show($athlete_id, Request $request)
     {
         $athlete = Athlete::where('athlete_id', $athlete_id)->first();
-        // Fallback: if model is missing or fields are empty, use request/query data
-        $weight = $athlete?->weight ?? $request->get('weight');
-        $height = $athlete?->height ?? $request->get('height');
-        $bmi = $athlete?->bmi;
+        
+        if (!$athlete) {
+            return redirect()->route('athletes.create')->with('error', 'Athlete profile not found.');
+        }
+        
+        // Use athlete data directly - no need for query param fallback
+        // since data should be persisted in database
+        $weight = $athlete->weight;
+        $height = $athlete->height;
+        $bmi = $athlete->bmi;
+        
+        // Calculate BMI if missing but weight/height exist
         if (!$bmi && $weight && $height) {
             $bmi = round($weight / pow($height / 100, 2), 2);
         }
+        
         $data = [
             'athlete' => $athlete,
-            'name' => $athlete?->name ?? $request->get('name'),
-            'email' => $athlete?->email ?? $request->get('email'),
+            'name' => $athlete->name,
+            'email' => $athlete->email,
             'weight' => $weight,
             'height' => $height,
             'bmi' => $bmi,
-            'sport' => $athlete?->sport ?? $request->get('sport'),
-            'training_intensity' => $athlete?->intensity ?? $request->get('training_intensity'),
+            'sport' => $athlete->sport,
+            'training_intensity' => $athlete->intensity,
         ];
         return view('profile.athlprofile', $data);
     }
