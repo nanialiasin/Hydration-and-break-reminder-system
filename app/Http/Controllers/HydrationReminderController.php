@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Services\HydrationReminderService;
 use Illuminate\Http\JsonResponse;
 use App\Models\HydrationSession;
+use App\Models\Athlete;
+use App\Models\Coach;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
@@ -49,6 +51,61 @@ class HydrationReminderController extends Controller
     // Starts a training session and stores active session metadata.
     public function startSession(Request $request)
     {
+        $user = auth()->user();
+
+        // Coach flow: create to-do sessions for managed athletes.
+        if ($user && $user->role === 'coach') {
+            $sport = (string) $request->input('sport', 'General Training');
+            $intensity = (string) $request->input('intensity', 'beginner');
+            $totalDuration = ((int) $request->input('hours', 0) * 60) + (int) $request->input('minutes', 0);
+
+            if ($totalDuration <= 0) {
+                $totalDuration = 30;
+            }
+
+            $coach = Coach::where('email', $user->email)->first();
+
+            $athletesQuery = Athlete::query();
+            $athletesQuery->where('created_by_coach', (string) $user->id);
+
+            if ($coach && !empty($coach->coach_id)) {
+                $athletesQuery->orWhere('created_by_coach', $coach->coach_id);
+            }
+
+            $athletes = $athletesQuery->get();
+
+            if ($athletes->isEmpty()) {
+                return redirect()->route('coach.creating')->with('error', 'No athletes found to assign this session.');
+            }
+
+            $createdCount = 0;
+
+            foreach ($athletes as $athlete) {
+                HydrationSession::create([
+                    'athlete_id' => $athlete->athlete_id,
+                    'coach_id' => (string) $user->id,
+                    'assigned_by_coach' => true,
+                    'sport' => $sport,
+                    'intensity' => $intensity,
+                    'planned_duration_minutes' => $totalDuration,
+                    'actual_duration_seconds' => 0,
+                    'temperature' => 32,
+                    'humidity' => 74,
+                    'reminder_interval_minutes' => 20,
+                    'alerts' => 0,
+                    'followed' => 0,
+                    'ignored' => 0,
+                    'hydration_score' => 0,
+                    'completed_at' => null,
+                    'started_at' => null,
+                ]);
+
+                $createdCount++;
+            }
+
+            return redirect()->route('coach.creating')->with('success', "Session assigned to {$createdCount} athlete(s).");
+        }
+
         $sensor = $this->getSensorReading();
         $temperature = (float) $sensor['temperature'];
         $humidity = (float) $sensor['humidity'];
@@ -77,7 +134,19 @@ class HydrationReminderController extends Controller
         }
 
         // Save active session details for later completion.
+        $assignedSessionId = $request->input('assigned_session_id');
+
+        if ($assignedSessionId) {
+            $assignedSession = HydrationSession::find((int) $assignedSessionId);
+
+            if ($assignedSession && !$assignedSession->completed_at && !$assignedSession->started_at) {
+                $assignedSession->started_at = now();
+                $assignedSession->save();
+            }
+        }
+
         $request->session()->put('active_session', [
+            'assigned_session_id' => $assignedSessionId,
             'sport' => $sport,
             'intensity' => $intensity,
             'planned_duration_minutes' => $totalDuration,
@@ -185,6 +254,16 @@ class HydrationReminderController extends Controller
     {
         // Retrieve active session defaults.
         $activeSession = $request->session()->get('active_session', []);
+        $assignedSessionId = isset($activeSession['assigned_session_id'])
+            ? (int) $activeSession['assigned_session_id']
+            : null;
+
+        $athleteId = null;
+        $user = auth()->user();
+        if ($user) {
+            $athlete = Athlete::where('email', $user->email)->first();
+            $athleteId = $athlete?->athlete_id;
+        }
 
         // Normalize posted session metrics.
         $alerts = max(0, (int) $request->input('alerts', 0));
@@ -202,21 +281,55 @@ class HydrationReminderController extends Controller
             ? (int) round(($followed / $alerts) * 100)
             : 0;
 
-        // Persist completed session.
-        $savedSession = HydrationSession::create([
-            'sport' => $activeSession['sport'] ?? 'General Training',
-            'intensity' => $activeSession['intensity'] ?? 'beginner',
-            'planned_duration_minutes' => (int) ($activeSession['planned_duration_minutes'] ?? 0),
-            'actual_duration_seconds' => $durationSeconds,
-            'temperature' => (int) ($activeSession['temperature'] ?? 32),
-            'humidity' => (int) ($activeSession['humidity'] ?? 74),
-            'reminder_interval_minutes' => (int) ($activeSession['interval_minutes'] ?? 20),
-            'alerts' => $alerts,
-            'followed' => $followed,
-            'ignored' => $ignored,
-            'hydration_score' => $hydrationScore,
-            'completed_at' => now(),
-        ]);
+        $savedSession = null;
+
+        // Complete assigned coach task when provided.
+        if ($assignedSessionId) {
+            $assignedSession = HydrationSession::find($assignedSessionId);
+
+            if ($assignedSession && !$assignedSession->completed_at) {
+                $assignedSession->sport = $activeSession['sport'] ?? $assignedSession->sport;
+                $assignedSession->intensity = $activeSession['intensity'] ?? $assignedSession->intensity;
+                $assignedSession->planned_duration_minutes = (int) ($activeSession['planned_duration_minutes'] ?? $assignedSession->planned_duration_minutes);
+                $assignedSession->actual_duration_seconds = $durationSeconds;
+                $assignedSession->temperature = (int) ($activeSession['temperature'] ?? 32);
+                $assignedSession->humidity = (int) ($activeSession['humidity'] ?? 74);
+                $assignedSession->reminder_interval_minutes = (int) ($activeSession['interval_minutes'] ?? 20);
+                $assignedSession->alerts = $alerts;
+                $assignedSession->followed = $followed;
+                $assignedSession->ignored = $ignored;
+                $assignedSession->hydration_score = $hydrationScore;
+                $assignedSession->started_at = $assignedSession->started_at ?: now()->subSeconds($durationSeconds);
+                $assignedSession->completed_at = now();
+                if ($athleteId && empty($assignedSession->athlete_id)) {
+                    $assignedSession->athlete_id = $athleteId;
+                }
+                $assignedSession->save();
+
+                $savedSession = $assignedSession;
+            }
+        }
+
+        // Fallback: persist as standalone completed session.
+        if (!$savedSession) {
+            $savedSession = HydrationSession::create([
+                'athlete_id' => $athleteId,
+                'assigned_by_coach' => false,
+                'sport' => $activeSession['sport'] ?? 'General Training',
+                'intensity' => $activeSession['intensity'] ?? 'beginner',
+                'planned_duration_minutes' => (int) ($activeSession['planned_duration_minutes'] ?? 0),
+                'actual_duration_seconds' => $durationSeconds,
+                'temperature' => (int) ($activeSession['temperature'] ?? 32),
+                'humidity' => (int) ($activeSession['humidity'] ?? 74),
+                'reminder_interval_minutes' => (int) ($activeSession['interval_minutes'] ?? 20),
+                'alerts' => $alerts,
+                'followed' => $followed,
+                'ignored' => $ignored,
+                'hydration_score' => $hydrationScore,
+                'started_at' => now()->subSeconds($durationSeconds),
+                'completed_at' => now(),
+            ]);
+        }
 
         // Remove active session once saved.
         $request->session()->forget('active_session');
@@ -282,8 +395,21 @@ class HydrationReminderController extends Controller
     // History page with all completed sessions.
     public function showHistory()
     {
+        $query = HydrationSession::query()
+            ->whereNotNull('completed_at');
+
+        $user = auth()->user();
+        $athlete = null;
+
+        if ($user && $user->role === 'athlete') {
+            $athlete = Athlete::where('email', $user->email)->first();
+            if ($athlete) {
+                $query->where('athlete_id', $athlete->athlete_id);
+            }
+        }
+
         // Build display-friendly session list.
-        $sessions = HydrationSession::query()
+        $sessions = $query
             ->latest('completed_at')
             ->latest('id')
             ->get()
@@ -298,6 +424,7 @@ class HydrationReminderController extends Controller
 
         return view('history', [
             'sessions' => $sessions,
+            'athlete' => $athlete,
         ]);
     }
 
