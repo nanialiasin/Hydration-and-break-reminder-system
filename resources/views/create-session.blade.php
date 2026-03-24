@@ -81,16 +81,16 @@
             <a href="{{ route('coach.home') }}" class="nav-item" aria-label="Home">
                 <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
             </a>
-            <a href="{{ route('training') }}" class="nav-item" aria-label="Training">
-                <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
+            <a href="{{ route('hydration.index') }}" class="nav-item" aria-label="Hydration">
+                <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
             </a>
-            <a href="{{ route('session.create') }}" class="nav-item active" aria-label="Create">
+            <a href="{{ route('coach.creating') }}" class="nav-item active" aria-label="Create">
                 <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
             </a>
-            <a href="{{ route('history') }}" class="nav-item" aria-label="History">
+            <a href="{{ route('coach.sessions.progress') }}" class="nav-item" aria-label="History">
                 <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
             </a>
-            <a href="#" class="nav-item" aria-label="Profile">
+            <a href="{{ route('coach.profile') }}" class="nav-item" aria-label="Profile">
                 <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
             </a>
         </nav>

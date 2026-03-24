@@ -1,50 +1,97 @@
-@extends('layouts.app')
-<link rel="stylesheet" href="{{ asset('css/hydration.css') }}">
-<link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
-<style>
-    body, h1, h2, h3, p, span {
-        font-family: 'Poppins', Arial, sans-serif !important;
-    }
-</style>
-@section('content')
-<div class="center-viewport">
-    <div class="container py-5" style="max-width: 900px;">
-        <div class="settings-container">
-            <div class="top-bar mb-3">
-                <a href="{{ url()->previous() }}" class="back-arrow me-2" title="Back">&#8592;</a>
-                <h2 class="mb-4 d-inline-block">Edit Hydration Settings</h2>
-            </div>
-            <form action="{{ route('hydration.update') }}" method="POST">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Hydration Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ asset('css/hydration.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<main role="main" class="app-shell">
+    <div class="content">
+        <div class="top-row">
+            <a href="{{ route('hydration.index') }}" class="back-link" aria-label="Back to hydration settings">&#8592;</a>
+            <h1 class="page-title page-title-compact">Edit Hydration Settings</h1>
+        </div>
+
+        <section class="card form-card">
+            <form action="{{ route('hydration.update') }}" method="POST" class="settings-form">
                 @csrf
-                <div class="card p-4 rounded-4">
-                    @foreach($settings as $setting)
-                        <div class="intensity-title mb-3 text-center">{{ ucfirst($setting->intensity ?? $setting->level) }}</div>
-                        <div class="mb-2">
-                            <label>Hydration reminder every</label>
-                            <input type="number" name="settings[{{ $setting->id }}][hydration_reminder]"
-                                   value="{{ $setting->hydration_reminder }}"
-                                   class="form-control">
+
+                @foreach($settings as $setting)
+                    <div class="setting-form-block">
+                        <h2 class="setting-intensity">{{ ucfirst($setting->intensity ?? $setting->level) }}</h2>
+
+                        <div class="field-row">
+                            <label class="field-label" for="hydration_reminder_{{ $setting->id }}">Hydration reminder every (min)</label>
+                            <input
+                                id="hydration_reminder_{{ $setting->id }}"
+                                type="number"
+                                min="1"
+                                name="settings[{{ $setting->id }}][hydration_reminder]"
+                                value="{{ $setting->hydration_reminder }}"
+                                class="field-input"
+                                required
+                            >
                         </div>
-                        <div class="mb-2">
-                            <label>Break duration</label>
-                            <input type="number" name="settings[{{ $setting->id }}][break_duration]"
-                                   value="{{ $setting->break_duration }}"
-                                   class="form-control">
+
+                        <div class="field-row">
+                            <label class="field-label" for="break_duration_{{ $setting->id }}">Break duration (min)</label>
+                            <input
+                                id="break_duration_{{ $setting->id }}"
+                                type="number"
+                                min="1"
+                                name="settings[{{ $setting->id }}][break_duration]"
+                                value="{{ $setting->break_duration }}"
+                                class="field-input"
+                                required
+                            >
                         </div>
-                        <div class="mb-3">
-                            <label>Break reminder every</label>
-                            <input type="number" name="settings[{{ $setting->id }}][break_reminder]"
-                                   value="{{ $setting->break_reminder }}"
-                                   class="form-control">
+
+                        <div class="field-row">
+                            <label class="field-label" for="break_reminder_{{ $setting->id }}">Break reminder every (min)</label>
+                            <input
+                                id="break_reminder_{{ $setting->id }}"
+                                type="number"
+                                min="1"
+                                name="settings[{{ $setting->id }}][break_reminder]"
+                                value="{{ $setting->break_reminder }}"
+                                class="field-input"
+                                required
+                            >
                         </div>
-                        <hr>
-                    @endforeach
-                    <button type="submit" class="btn dark-btn">
-                        Save Changes
-                    </button>
+                    </div>
+
+                    @if(!$loop->last)
+                        <hr class="setting-divider">
+                    @endif
+                @endforeach
+
+                <div class="form-actions">
+                    <a href="{{ route('hydration.index') }}" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn btn-save">Save Changes</button>
                 </div>
             </form>
-        </div>
+        </section>
     </div>
-</div>
-@endsection
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+        <a href="{{ route('coach.home') }}" class="navi-item" aria-label="Home">
+            <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+        </a>
+        <a href="{{ route('hydration.index') }}" class="navi-item active" aria-label="Hydration">
+            <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.creating') }}" class="navi-item" aria-label="Activity">
+            <img src="{{ asset('images/Create.svg') }}" alt="Activity" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.sessions.progress') }}" class="navi-item" aria-label="History">
+            <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.profile') }}" class="navi-item" aria-label="Profile">
+            <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+        </a>
+    </nav>
+</main>
+</body>
+</html>

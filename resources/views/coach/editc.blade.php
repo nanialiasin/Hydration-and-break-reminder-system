@@ -1,71 +1,86 @@
-@extends('layouts.app')
-<link rel="stylesheet" href="{{ asset('css/coachprofile.css') }}">
-<link rel="stylesheet" href="{{ asset('css/editprofile.css') }}">
-<link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
-@section('content')
-<div class="profile-page">
-    <div class="profile-container">
-        <div class="profile-title mb-3 text-start" style="text-align:left;">Edit Profile</div>
-        <div class="profile-card" style="position:relative;display:flex;flex-direction:column;align-items:center;padding-bottom:32px;width:100%;max-width:400px;margin:0 auto;">
-            <div style="width:100%;max-width:180px;display:flex;flex-direction:column;align-items:center;margin-bottom:18px;">
-                <div class="coach-avatar mb-2" style="margin-bottom: 18px;display:flex;justify-content:center;width:100%;">
-                    <img src="{{ $coach?->profile_pic && $coach?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $coach->profile_pic) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView" style="border: 4px solid #e0e7ef; border-radius: 50%; object-fit: cover;">
-                </div>
-                <form id="profile-pic-form" method="POST" action="{{ route('coach.updatePic', $coach->id) }}" enctype="multipart/form-data" style="text-align:center;width:100%;margin-bottom:10px;">
-                    @csrf
-                    <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" style="display:none;">
-                    <button type="button" class="btn btn-dark btn-sm mt-2" style="padding: 10px 32px; font-weight: 600; font-size: 16px; border-radius: 10px;" onclick="document.getElementById('profilePicInput').click();">Change Profile</button>
-                    <button type="submit" class="btn btn-dark btn-sm mt-2" style="padding: 10px 32px; font-weight: 600; font-size: 16px; border-radius: 10px; display:none;" id="savePicBtn">Save</button>
-                </form>
-                <div class="coach-id" style="text-align:center;font-weight:600;font-size:18px;margin-bottom:0;width:100%;">Coach ID : {{ $coach->coach_id ?? $coach->id }}</div>
-                <hr style="border:none; border-top:1.5px solid #e9ecf5; margin-bottom:8px; margin-top:0;">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Coach Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="{{ asset('css/coach-edit.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<main class="app-shell" role="main">
+    <div class="content">
+        <h1 class="profile-title">Edit Profile</h1>
+
+        <section class="card profile-card">
+            <div class="coach-avatar">
+                <img src="{{ $coach?->profile_pic && $coach?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $coach->profile_pic) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
             </div>
-            <hr style="border:none; border-top:1.5px solid #e9ecf5; margin-bottom:18px; margin-top:0;">          
-            <form action="{{ route('coach.update', ['id' => $coach->id]) }}" method="POST" style="width:100%;max-width:340px;">
+
+            <div class="coach-id-wrap">
+                <h2 class="coach-id">Coach ID: {{ $coach->coach_id }}</h2>
+            </div>
+
+            <form id="edit-form" action="{{ route('coach.update', $coach->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
-                <div class="input-group">
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{ $coach->name }}" class="form-control mini-rectangle">
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" value="{{ $coach->name }}" required class="form-field">
                 </div>
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" name="email" value="{{ $coach->email }}" class="form-control mini-rectangle" readonly>
-                    <br><small class="text-danger">Email cannot be changed.</small>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="{{ $coach->email }}" readonly class="form-field readonly-field">
+                    <small class="text-muted">Email cannot be changed</small>
                 </div>
-                <div class="input-group">
-                    <label>Phone Number</label>
-                    <input type="text" name="phone_number" value="{{ $coach->phone_number }}" class="form-control mini-rectangle">
+
+                <div class="form-group">
+                    <label for="phone_number">Phone Number</label>
+                    <input type="text" id="phone_number" name="phone_number" value="{{ $coach->phone_number }}" required class="form-field">
                 </div>
-                <div class="input-group">
-                    <label>Team Name</label>
-                    <input type="text" name="team_name" value="{{ $coach->team_name }}" class="form-control mini-rectangle">
+
+                <div class="form-group">
+                    <label for="team_name">Team Name</label>
+                    <input type="text" id="team_name" name="team_name" value="{{ $coach->team_name }}" class="form-field">
                 </div>
-                <div class="button-group" style="display:flex;justify-content:center;gap:16px;margin-top:32px;">
-                    <button class="btn btn-dark">Save</button>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
                     <a href="{{ route('coach.profile') }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
-        </div>
+
+            <div class="pic-upload-section">
+                <form id="profile-pic-form" method="POST" action="{{ route('coach.updatePic', $coach->id) }}" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" style="display:none;">
+                    <button type="button" class="btn-change-pic" onclick="document.getElementById('profilePicInput').click();">Change Profile Picture</button>
+                    <button type="submit" class="btn-save-pic" id="savePicBtn" style="display:none;">Save Picture</button>
+                </form>
+            </div>
+        </section>
     </div>
-</div>
-@endsection
-<style>
-.input-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 18px;
-}
-.mini-rectangle {
-    border-radius: 10px;
-    padding: 10px 16px;
-    background: #f7faff;
-    border: 1.5px solid #e0e7ef;
-    font-size: 16px;
-    box-shadow: 0 1px 4px rgba(30,58,47,0.06);
-    margin-top: 6px;
-}
-</style>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+        <a href="{{ route('coach.home') }}" class="navi-item" aria-label="Home">
+            <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+        </a>
+        <a href="{{ route('hydration.index') }}" class="navi-item" aria-label="Hydration">
+            <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.creating') }}" class="navi-item" aria-label="Activity">
+            <img src="{{ asset('images/Create.svg') }}" alt="Activity" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.sessions.progress') }}" class="navi-item" aria-label="History">
+            <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.profile') }}" class="navi-item active" aria-label="Profile">
+            <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+        </a>
+    </nav>
+</main>
 <script>
 document.getElementById('profilePicInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -79,3 +94,5 @@ document.getElementById('profilePicInput').addEventListener('change', function(e
     }
 });
 </script>
+</body>
+</html>

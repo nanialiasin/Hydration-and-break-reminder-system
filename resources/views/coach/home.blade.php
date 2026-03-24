@@ -1,57 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Coach Homepage</title>
+    <title>Coach Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/homec.css') }}">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
-    <style>
-        body, h1, h2, h3, p, span {
-            font-family: 'Poppins', Arial, sans-serif !important;
-        }
-    </style>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="{{ asset('css/coach-home.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 <main class="app-shell" role="main">
-    <div class="container">
+    <div class="content">
+        <h1 class="greeting">Welcome, Coach.</h1>
 
-        <h1>Welcome, Coach.</h1>
+        <section class="stats-card">
+            <div class="stat-row">
+                <span class="stat-label">Total Athletes</span>
+                <span class="stat-value">{{ $totalAthletes ?? 0 }}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Active Athletes</span>
+                <span class="stat-value">{{ $activeAthletes ?? 0 }}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Inactive Athletes</span>
+                <span class="stat-value">{{ $inactiveAthletes ?? 0 }}</span>
+            </div>
+        </section>
 
-        <div class="training-card">
-            Today's Training Time :
-        </div>
+        <section class="summary-card">
+            <h2 class="card-title">Team Summary</h2>
+            <div class="summary-item">
+                <span class="summary-label">Average Intensity</span>
+                <span class="summary-value">{{ $averageIntensity ?? 'N/A' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Last Updated</span>
+                <span class="summary-value">Today</span>
+            </div>
+        </section>
 
-        <div class="card">
-            <div class="card-title">Team Overview :</div>
-            <p>Total Athletes : {{ $totalAthletes }}</p>
-            <p>Checked-in : {{ $checkedIn }}</p>
-            <p>Not Checked-in : {{ $notCheckedIn }}</p>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Recent Activities :</div>
-            <p>No recent activity.</p>
-        </div>
-
+        <section class="actions-card">
+            <h2 class="card-title">Quick Actions</h2>
+            <div class="action-buttons">
+                <a href="{{ route('athletes.addathlete') }}" class="action-btn">Add Athlete</a>
+                <a href="{{ route('session.create') }}" class="action-btn">Create Session</a>
+            </div>
+        </section>
     </div>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+        <a href="{{ route('coach.home') }}" class="nav-item active" aria-label="Home">
+            <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+        </a>
+        <a href="{{ route('hydration.index') }}" class="nav-item" aria-label="Hydration">
+            <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.creating') }}" class="nav-item" aria-label="Activity">
+            <img src="{{ asset('images/Create.svg') }}" alt="Activity" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.sessions.progress') }}" class="nav-item" aria-label="History">
+            <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.profile') }}" class="nav-item" aria-label="Profile">
+            <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+        </a>
+    </nav>
 </main>
-<nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
-    <a href="{{ route('coach.home') }}" class="navi-item" aria-label="Home">
-        <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
-    </a>
-    <a href="{{ route('hydration.index') }}" class="navi-item" aria-label="Hydration">
-        <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
-    </a>
-    <a href="{{ route('coach.creating') }}" class="navi-item" aria-label="Create">
-        <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
-    </a>
-    <a href="#" class="navi-item active" aria-label="History">
-        <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
-    </a>
-    <a href="{{ route('coach.profile') }}" class="navi-item" aria-label="Profile">
-        <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
-    </a>
-</nav>
 </body>
 </html>
