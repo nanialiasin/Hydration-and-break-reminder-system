@@ -13,7 +13,7 @@ use App\Http\Controllers\CoachProfileController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/login', function () {
@@ -117,13 +117,21 @@ Route::get('/home', function () {
 
 Route::get('/training', function () {
     $athlete = \App\Models\Athlete::where('email', Auth::user()->email)->first();
-    return view('training', compact('athlete'));
+
+    $todoSessions = collect();
+    if ($athlete) {
+        $todoSessions = \App\Models\HydrationSession::query()
+            ->where('assigned_by_coach', true)
+            ->where('athlete_id', $athlete->athlete_id)
+            ->whereNull('completed_at')
+            ->latest('id')
+            ->get();
+    }
+
+    return view('training', compact('athlete', 'todoSessions'));
 })->name('training');
 
-Route::get('/history', function () {
-    $athlete = \App\Models\Athlete::where('email', Auth::user()->email)->first();
-    return view('history', compact('athlete'));
-})->name('history');
+Route::get('/history', [HydrationReminderController::class, 'showHistory'])->name('history');
 
 Route::get('/session/create', function () {
     return view('create-session');
@@ -148,11 +156,8 @@ Route::post('/session/end', [HydrationReminderController::class, 'endSession'])
 
 Route::post('/hydration/calculate', [HydrationReminderController::class, 'getReminderStatus']);
 
-Route::get('/', function () {
-    return redirect()->route('coach.creating');
-});
-
 Route::get('/coach/creating', [CoachDashboardController::class, 'index'])
+    ->middleware('auth')
     ->name('coach.creating');
 
 Route::get('/athletes/fetch/{athlete_id}', [AthleteController::class, 'fetch'])->name('athletes.fetch');
@@ -163,6 +168,7 @@ Route::post('/athletes', [AthleteController::class, 'store'])->name('athletes.st
 Route::get('/athletes/addathlete', function () {
     return view('athletes.addathlete');
 })->name('athletes.addathlete');
+Route::post('/athletes/addathlete', [AthleteController::class, 'addById'])->name('athletes.add.byid');
 
 Route::get('/athletes/remove', [AthleteController::class, 'removePage'])->name('athletes.remove');
 Route::delete('/athletes/remove', [AthleteController::class, 'destroyById'])->name('athletes.destroy.byid');
@@ -172,6 +178,9 @@ Route::get('/hydration/edit', [HydrationSettingController::class, 'edit'])->name
 Route::post('/hydration/update', [HydrationSettingController::class, 'update'])->name('hydration.update');
 
 Route::get('/coach/home', [CoachController::class, 'index'])->name('coach.home');
+Route::get('/coach/sessions/in-progress', [CoachController::class, 'inProgressSessions'])
+    ->middleware('auth')
+    ->name('coach.sessions.progress');
 
 Route::get('/athlprofile/{athlete_id}', [AthleteController::class, 'show'])->name('profile.athlprofile');
 
@@ -246,3 +255,9 @@ Route::delete('/profile/delete', function () {
 Route::get('/profile/delete/confirm', function () {
     return view('profile.delete');
 })->name('profile.delete.confirm');
+
+Route::match(['get', 'post'], '/sensor/ingest', [HydrationReminderController::class, 'ingestSensorReading'])
+    ->name('sensor.ingest');
+
+Route::get('/sensor/latest', [HydrationReminderController::class, 'latestSensorReading'])
+    ->name('sensor.latest');

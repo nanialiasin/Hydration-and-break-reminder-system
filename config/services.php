@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'hydration_sensor' => [
+        'key' => env('HYDRATION_SENSOR_KEY', ''),
+    ],
+
 ];

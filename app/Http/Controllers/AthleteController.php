@@ -33,10 +33,39 @@ class AthleteController extends Controller
                 'name' => $athlete->name,
                 'sport' => $athlete->sport,
                 'intensity' => $athlete->intensity,
+                'training_intensity' => $athlete->intensity,
                 'status' => $athlete->status,
             ]);
         }
         return response()->json(null, 404);
+    }
+
+    public function addById(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in as a coach.');
+        }
+
+        $validated = $request->validate([
+            'athlete_id' => 'required|string',
+        ]);
+
+        $athlete = Athlete::where('athlete_id', $validated['athlete_id'])->first();
+
+        if (!$athlete) {
+            return back()->with('error', 'Athlete ID not found.');
+        }
+
+        $coachId = (string) $user->id;
+        if ((string) $athlete->created_by_coach === $coachId) {
+            return back()->with('success', 'Athlete is already in your team.');
+        }
+
+        $athlete->created_by_coach = $coachId;
+        $athlete->save();
+
+        return back()->with('success', 'Athlete added to your team successfully.');
     }
 
     public function store(Request $request)
@@ -45,17 +74,12 @@ class AthleteController extends Controller
         if (!$user) {
             return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
         }
-        // Check if athlete profile already exists for this user
-        $existing = Athlete::where('email', $user->email)->first();
-        if ($existing) {
-            // Redirect to existing profile
-            return redirect()->route('profile.athlprofile', ['athlete_id' => $existing->athlete_id]);
-        }
-        $request->validate([
+
+        $validated = $request->validate([
             'name' => 'required',
             'sport' => 'required',
-            'weight' => 'required|numeric',
-            'height' => 'required|numeric',
+            'weight' => 'required|numeric|min:1',
+            'height' => 'required|numeric|min:1',
             'training_intensity' => 'required',
         ]);
         // Use Athlete model's ID generation for consistency
@@ -87,12 +111,13 @@ class AthleteController extends Controller
         $athlete = Athlete::where('athlete_id', $request->athlete_id)->first();
 
         if (!$athlete) {
-            return back()->with('success', 'Athlete not found.');
+            return back()->with('error', 'Athlete not found.');
         }
 
+        // Delete athlete and all related data (cascades through model)
         $athlete->delete();
 
-        return back()->with('success', 'Athlete removed successfully.');
+        return back()->with('success', 'Athlete and all associated data removed successfully.');
     }
 
     public function edit($athlete_id)

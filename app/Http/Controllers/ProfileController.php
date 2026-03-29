@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Athlete;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -25,10 +27,22 @@ class ProfileController extends Controller
 
     public function destroy()
     {
-        $athlete = Auth::athlete();
-        Auth::logout();
-        $athlete->delete();
+        $user = Auth::user();
+        $athlete = Athlete::where('email', $user->email)->first();
 
-        return redirect('/');
+        // Logout before deletion
+        Auth::logout();
+
+        // Delete athlete and all related data (cascades through model)
+        if ($athlete) {
+            $athlete->delete();
+        }
+
+        // Delete the user account
+        if ($user) {
+            $user->delete();
+        }
+
+        return redirect('/')->with('success', 'Account and all associated data have been permanently deleted.');
     }
 }

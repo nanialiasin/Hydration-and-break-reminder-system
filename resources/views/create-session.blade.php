@@ -84,10 +84,10 @@
             <a href="{{ route('hydration.index') }}" class="nav-item" aria-label="Hydration">
                 <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
             </a>
-            <a href="{{ route('session.create') }}" class="nav-item active" aria-label="Create">
+            <a href="{{ route('coach.creating') }}" class="nav-item active" aria-label="Create">
                 <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
             </a>
-            <a href="{{ route('history') }}" class="nav-item" aria-label="History">
+            <a href="{{ route('coach.sessions.progress') }}" class="nav-item" aria-label="History">
                 <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
             </a>
             <a href="{{ route('coach.profile') }}" class="nav-item" aria-label="Profile">
