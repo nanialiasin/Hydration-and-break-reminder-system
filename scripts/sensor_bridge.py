@@ -89,68 +89,75 @@ def main() -> int:
 
     ingest_url = build_url(args.app_url)
 
-    print(f"Opening serial port {args.port} @ {args.baud}...")
     print(f"Posting to {ingest_url}")
-
-    try:
-        ser = serial.Serial(args.port, args.baud, timeout=1)
-    except Exception as exc:
-        print(f"ERROR: Unable to open serial port {args.port}: {exc}", file=sys.stderr)
-        return 3
 
     last_sent_at = 0.0
     last_values: tuple[float, float] | None = None
 
-    with ser:
-        while True:
-            try:
-                raw = ser.readline()
-                line = raw.decode("utf-8", errors="ignore").strip()
-                if not line:
-                    continue
+    ser = None
 
-                values = parse_line(line)
-                if values is None:
-                    continue
+    while True:
+        try:
+            if ser is None or not ser.is_open:
+                print(f"Connecting serial port {args.port} @ {args.baud}...")
+                ser = serial.Serial(args.port, args.baud, timeout=1)
+                print("Serial connected.")
 
-                temperature, humidity = values
-                now = time.time()
+            raw = ser.readline()
+            line = raw.decode("utf-8", errors="ignore").strip()
+            if not line:
+                continue
 
-                if (
-                    last_values is not None
-                    and (temperature, humidity) == last_values
-                    and (now - last_sent_at) < args.dedupe_seconds
-                ):
-                    continue
+            values = parse_line(line)
+            if values is None:
+                continue
 
-                ok, response_text = send_reading(
-                    ingest_url,
-                    temperature,
-                    humidity,
-                    key=args.key,
-                    timeout=args.timeout,
-                )
+            temperature, humidity = values
+            now = time.time()
 
-                if ok:
-                    last_values = (temperature, humidity)
-                    last_sent_at = now
-                    print(f"OK temp={temperature:.1f}C hum={humidity:.1f}%")
-                else:
-                    print(f"ERROR temp={temperature:.1f} hum={humidity:.1f}: {response_text}")
+            if (
+                last_values is not None
+                and (temperature, humidity) == last_values
+                and (now - last_sent_at) < args.dedupe_seconds
+            ):
+                continue
 
-                    # Print helpful details for JSON errors.
-                    try:
-                        parsed = json.loads(response_text)
-                        print(parsed)
-                    except Exception:
-                        pass
+            ok, response_text = send_reading(
+                ingest_url,
+                temperature,
+                humidity,
+                key=args.key,
+                timeout=args.timeout,
+            )
 
-            except KeyboardInterrupt:
-                print("Stopped by user.")
-                return 0
-            except Exception as exc:
-                print(f"WARN: bridge loop error: {exc}")
-                time.sleep(0.5)
+            if ok:
+                last_values = (temperature, humidity)
+                last_sent_at = now
+                print(f"OK temp={temperature:.1f}C hum={humidity:.1f}%")
+            else:
+                print(f"ERROR temp={temperature:.1f} hum={humidity:.1f}: {response_text}")
+
+                # Print helpful details for JSON errors.
+                try:
+                    parsed = json.loads(response_text)
+                    print(parsed)
+                except Exception:
+                    pass
+
+        except KeyboardInterrupt:
+            print("Stopped by user.")
+            if ser and ser.is_open:
+                ser.close()
+            return 0
+        except serial.SerialException as exc:
+            print(f"WARN: serial disconnected or unavailable: {exc}")
+            if ser and ser.is_open:
+                ser.close()
+            ser = None
+            time.sleep(1.0)
+        except Exception as exc:
+            print(f"WARN: bridge loop error: {exc}")
+            time.sleep(0.5)
 
 
 if __name__ == "__main__":

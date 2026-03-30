@@ -10,11 +10,12 @@ use App\Models\Athlete;
 use App\Models\Coach;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class HydrationReminderController extends Controller
 {
     private const SENSOR_CACHE_KEY = 'hydration.latest_sensor_reading';
-    private const SENSOR_STALE_AFTER_SECONDS = 8;
+    private const DEFAULT_SENSOR_STALE_AFTER_SECONDS = 30;
 
     // Service that calculates smart hydration intervals.
     protected $hydrationService;
@@ -177,6 +178,11 @@ class HydrationReminderController extends Controller
         $providedKey = (string) ($request->input('key') ?? $request->header('X-Sensor-Key', ''));
 
         if ($configuredKey !== '' && !hash_equals($configuredKey, $providedKey)) {
+            Log::warning('Sensor ingest rejected due to invalid key.', [
+                'ip' => $request->ip(),
+                'user_agent' => (string) $request->userAgent(),
+            ]);
+
             return response()->json([
                 'ok' => false,
                 'message' => 'Unauthorized sensor key.',
@@ -187,6 +193,12 @@ class HydrationReminderController extends Controller
         $humidityInput = $request->input('humidity');
 
         if (!is_numeric($temperatureInput) || !is_numeric($humidityInput)) {
+            Log::warning('Sensor ingest rejected due to non-numeric payload.', [
+                'temperature' => $temperatureInput,
+                'humidity' => $humidityInput,
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json([
                 'ok' => false,
                 'message' => 'temperature and humidity must be numeric.',
@@ -218,13 +230,14 @@ class HydrationReminderController extends Controller
     public function showHome()
     {
         $sensor = $this->getSensorReading();
-        $hasLiveSensorReading = (($sensor['source'] ?? 'fallback') === 'sensor');
+        $sensorSource = (string) ($sensor['source'] ?? 'fallback');
+        $hasUsableSensorReading = in_array($sensorSource, ['sensor', 'stale'], true);
 
-        $temperature = $hasLiveSensorReading ? (float) $sensor['temperature'] : 0.0;
-        $humidity = $hasLiveSensorReading ? (float) $sensor['humidity'] : 0.0;
+        $temperature = $hasUsableSensorReading ? (float) $sensor['temperature'] : 0.0;
+        $humidity = $hasUsableSensorReading ? (float) $sensor['humidity'] : 0.0;
 
-        $intervalTemperature = $hasLiveSensorReading ? $temperature : 32.0;
-        $intervalHumidity = $hasLiveSensorReading ? $humidity : 74.0;
+        $intervalTemperature = $hasUsableSensorReading ? $temperature : 32.0;
+        $intervalHumidity = $hasUsableSensorReading ? $humidity : 74.0;
 
         // Use baseline conditions for home preview interval.
         $interval = $this->hydrationService->calculateInterval($intervalTemperature, $intervalHumidity, 60);
@@ -488,6 +501,7 @@ class HydrationReminderController extends Controller
     private function getSensorReading(): array
     {
         $cached = Cache::get(self::SENSOR_CACHE_KEY);
+        $staleAfterSeconds = $this->sensorStaleAfterSeconds();
 
         if (is_array($cached) && isset($cached['temperature'], $cached['humidity'])) {
             $updatedAtRaw = (string) ($cached['updated_at'] ?? now()->toDateTimeString());
@@ -495,10 +509,10 @@ class HydrationReminderController extends Controller
             try {
                 $ageSeconds = Carbon::parse($updatedAtRaw)->diffInSeconds(now());
             } catch (\Throwable $e) {
-                $ageSeconds = self::SENSOR_STALE_AFTER_SECONDS + 1;
+                $ageSeconds = $staleAfterSeconds + 1;
             }
 
-            if ($ageSeconds <= self::SENSOR_STALE_AFTER_SECONDS) {
+            if ($ageSeconds <= $staleAfterSeconds) {
                 return [
                     'temperature' => round((float) $cached['temperature'], 1),
                     'humidity' => round((float) $cached['humidity'], 1),
@@ -507,11 +521,12 @@ class HydrationReminderController extends Controller
                 ];
             }
 
+            // Keep the last known reading so USB disconnections don't hard-reset UI values to zero.
             return [
-                'temperature' => 0.0,
-                'humidity' => 0.0,
-                'updated_at' => now()->toDateTimeString(),
-                'source' => 'fallback',
+                'temperature' => round((float) $cached['temperature'], 1),
+                'humidity' => round((float) $cached['humidity'], 1),
+                'updated_at' => $updatedAtRaw,
+                'source' => 'stale',
             ];
         }
 
@@ -521,5 +536,12 @@ class HydrationReminderController extends Controller
             'updated_at' => now()->toDateTimeString(),
             'source' => 'fallback',
         ];
+    }
+
+    private function sensorStaleAfterSeconds(): int
+    {
+        $configured = (int) config('services.hydration_sensor.stale_after_seconds', self::DEFAULT_SENSOR_STALE_AFTER_SECONDS);
+
+        return max(1, $configured);
     }
 }

@@ -37,6 +37,7 @@ return [
 
     'hydration_sensor' => [
         'key' => env('HYDRATION_SENSOR_KEY', ''),
+        'stale_after_seconds' => (int) env('HYDRATION_SENSOR_STALE_AFTER_SECONDS', 30),
     ],
 
 ];
