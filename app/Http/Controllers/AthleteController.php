@@ -192,24 +192,36 @@ class AthleteController extends Controller
             'profile_pic' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $athlete = Auth::user();
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in.');
+        }
 
-        // Find athlete profile using the user's email
-        $athleteProfile = Athlete::where('email', $athlete->email)->first();
-        if (!$athleteProfile) {
+        // Find athlete profile using user's email
+        $athlete = Athlete::where('email', $user->email)->first();
+        if (!$athlete) {
             return redirect()->back()->with('error', 'Athlete profile not found.');
         }
-        $file = $request->file('profile_pic');
-        $filename = 'profile_' . $athleteProfile->athlete_id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('public/profile_pics', $filename);
 
-        // Optionally, delete old profile pic if not default
-        if ($athleteProfile->profile_pic && $athleteProfile->profile_pic !== 'default.jpg') {
-            \Storage::delete('public/profile_pics/' . $athleteProfile->profile_pic);
+        if ($request->hasFile('profile_pic')) {
+            $file = $request->file('profile_pic');
+            $filename = 'athlete_' . $athlete->athlete_id . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+            // Save file in storage/app/public/profile_pics
+            $stored = \Storage::disk('public')->putFileAs('profile_pics', $file, $filename);
+
+            if (!$stored) {
+                return redirect()->back()->with('error', 'Failed to save profile picture.');
+            }
+
+            // Delete old profile pic if not default
+            if ($athlete->profile_pic && $athlete->profile_pic !== 'default.jpg') {
+                \Storage::disk('public')->delete('profile_pics/' . $athlete->profile_pic);
+            }
+
+            $athlete->profile_pic = $filename;
+            $athlete->save();
         }
-
-        $athleteProfile->profile_pic = $filename;
-        $athleteProfile->save();
 
         return redirect()->back()->with('success', 'Profile picture updated successfully.');
     }

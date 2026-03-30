@@ -90,19 +90,26 @@ class CoachProfileController extends Controller
         if ($request->hasFile('profile_pic')) {
             $file = $request->file('profile_pic');
             $filename = uniqid('coach_') . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/profile_pics', $filename);
+
+            // Use the Storage facade with disk 'public'
+            $stored = \Storage::disk('public')->putFileAs('profile_pics', $file, $filename);
+
+            if (!$stored) {
+                return back()->with('error', 'Failed to save profile picture.');
+            }
 
             // Delete old profile pic if not default
             if ($coach->profile_pic && $coach->profile_pic !== 'default.jpg') {
-                \Storage::delete('public/profile_pics/' . $coach->profile_pic);
+                \Storage::disk('public')->delete('profile_pics/' . $coach->profile_pic);
             }
 
             $coach->profile_pic = $filename;
             $coach->save();
         }
 
-    return redirect()->route('coach.profile')->with('success', 'Profile picture updated!');
-}
+        return redirect()->route('coach.profile')->with('success', 'Profile picture updated!');
+    }
+    
     public function destroy($id)
     {
         $coach = Coach::findOrFail($id);
