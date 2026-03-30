@@ -3,15 +3,15 @@
 <head>
     <title>Edit Athlete Profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/editprofile.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/editprofile.css') }}?v={{ filemtime(public_path('css/editprofile.css')) }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <main class="app-shell" role="main">
     <div class="content">
-        <h1 class="page-title">Edit Profile</h1>
+        <h1 class="profile-title">Edit Profile</h1>
 
-        <section class="card">
+        <section class="card profile-card">
             @if ($errors->any())
                 <div class="alert" role="alert">
                     <ul>
@@ -22,67 +22,56 @@
                 </div>
             @endif
 
-            <div class="avatar-wrap">
+            <div class="athlete-avatar">
                 <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $athlete->profile_pic) : asset('images/default.jpg') }}" class="avatar" width="100" height="100" id="profilePicPreview">
-
-                <form id="profile-pic-form" method="POST" action="{{ route('profile.updatePic') }}" enctype="multipart/form-data" class="avatar-form">
-                    @csrf
-                    <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" class="hidden-input">
-                    <button type="button" class="btn btn-dark" onclick="document.getElementById('profilePicInput').click();">Change Photo</button>
-                    <button type="submit" class="btn btn-dark hidden" id="savePicBtn">Save Photo</button>
-                </form>
+                <div class="pic-upload-section">
+                    <form id="profile-pic-form" method="POST" action="{{ route('profile.updatePic') }}" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" class="hidden-input">
+                        <button type="button" class="btn-change-pic" onclick="document.getElementById('profilePicInput').click();">Change Photo</button>
+                        <button type="submit" class="btn-save-pic" id="savePicBtn" style="display:none;">Save Photo</button>
+                    </form>
+                </div>
             </div>
 
-            <p class="athlete-id">Athlete ID: {{ $athlete?->athlete_id ?? 'N/A' }}</p>
+            <div class="athlete-id-wrap">
+                <p class="athlete-id">Athlete ID: {{ $athlete?->athlete_id ?? 'N/A' }}</p>
+            </div>
 
-            <form method="POST" action="{{ route('athlete.profile.update', $athlete?->athlete_id) }}" class="edit-form">
+            <form id="edit-form" method="POST" action="{{ route('athlete.profile.update', $athlete?->athlete_id) }}" class="edit-form">
                 @csrf
                 @method('PUT')
 
-                <div class="input-group">
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{ old('name', $athlete?->name ?? Auth::user()->name ?? '') }}" class="field" required>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" value="{{ old('name', $athlete?->name ?? Auth::user()->name ?? '') }}" class="form-field" required>
                 </div>
 
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" value="{{ $athlete?->email ?? Auth::user()->email ?? '' }}" class="field readonly" readonly>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" value="{{ $athlete?->email ?? Auth::user()->email ?? '' }}" class="form-field readonly-field" readonly>
                     <small class="text-danger">Email cannot be changed.</small>
                 </div>
-                <div class="input-group">
-                    <label>Weight (kg)</label>
-                    <input type="number" name="weight" value="{{ old('weight', $athlete?->weight ?? Auth::user()->weight ?? '') }}" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+
+                <div class="form-group">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" id="weight" name="weight" value="{{ old('weight', $athlete?->weight ?? Auth::user()->weight ?? '') }}" class="form-field">
                 </div>
-                <div class="input-group">
-                    <label>Height (cm)</label>
-                    <input type="number" name="height" value="{{ old('height', $athlete?->height ?? Auth::user()->height ?? '') }}" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+
+                <div class="form-group">
+                    <label for="height">Height (cm)</label>
+                    <input type="number" id="height" name="height" value="{{ old('height', $athlete?->height ?? Auth::user()->height ?? '') }}" class="form-field">
                 </div>
-                <div class="input-group">
-                    <label>Status</label>
-                    <select name="status" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-field">
                         <option value="active" {{ (old('status', $athlete?->status ?? 'active') == 'active') ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ (old('status', $athlete?->status ?? '') == 'inactive') ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label class="mb-3">Training Intensity</label>
-                    <div class="intensity-group d-flex justify-content-center gap-5">
-                        <div class="d-flex flex-column align-items-center mx-3">
-                            <input type="radio" name="intensity" value="Beginner" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Beginner') ? 'checked' : '' }}>
-                            <span class="mt-2">Beginner</span>
-                        </div>
-                        <div class="d-flex flex-column align-items-center mx-3">
-                            <input type="radio" name="intensity" value="Intermediate" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Intermediate') ? 'checked' : '' }}>
-                            <span class="mt-2">Intermediate</span>
-                        </div>
-                        <div class="d-flex flex-column align-items-center mx-3">
-                            <input type="radio" name="intensity" value="Advanced" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Advanced') ? 'checked' : '' }}>
-                            <span class="mt-2">Advanced</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="input-group">
+                <div class="form-group">
                     <label>Training Intensity</label>
                     <div class="intensity-group">
                         <label><input type="radio" name="intensity" value="Beginner" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Beginner') ? 'checked' : '' }} required> Beginner</label>
@@ -92,8 +81,8 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="submit" class="btn btn-dark">Save</button>
-                    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="btn btn-light">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </section>
@@ -121,7 +110,7 @@
             const reader = new FileReader();
             reader.onload = function(event) {
                 document.getElementById('profilePicPreview').src = event.target.result;
-                document.getElementById('savePicBtn').classList.remove('hidden');
+                document.getElementById('savePicBtn').style.display = 'inline-block';
             };
             reader.readAsDataURL(file);
         }

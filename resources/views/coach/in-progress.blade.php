@@ -13,14 +13,14 @@
 
         <section class="list-wrap" aria-label="In progress sessions">
             @forelse(($sessions ?? collect()) as $session)
+                @php
+                    $taskKey = strtolower((string) ($session->sport ?? '')) . '|' . strtolower((string) ($session->intensity ?? '')) . '|' . (int) ($session->planned_duration_minutes ?? 0);
+                    $doneCount = $completedCounts[$taskKey] ?? 0;
+                @endphp
                 <article class="session-card">
                     <div class="row">
                         <span class="label">Status</span>
                         <span class="value">{{ $session->started_at ? 'In Progress' : 'Pending' }}</span>
-                    </div>
-                    <div class="row">
-                        <span class="label">Athlete</span>
-                        <span class="value">{{ $athleteNames[$session->athlete_id] ?? $session->athlete_id ?? 'Unknown' }}</span>
                     </div>
                     <div class="row">
                         <span class="label">Sport</span>
@@ -35,8 +35,8 @@
                         <span class="value">{{ (int)($session->planned_duration_minutes ?? 0) }} min</span>
                     </div>
                     <div class="row">
-                        <span class="label">Started</span>
-                        <span class="value">{{ optional($session->started_at)->diffForHumans() ?? 'Not started yet' }}</span>
+                        <span class="label">Completed Athletes</span>
+                        <span class="value">{{ $doneCount }}</span>
                     </div>
                 </article>
             @empty

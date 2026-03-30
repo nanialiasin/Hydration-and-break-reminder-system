@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/athlprofile.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="background-color: #e9ecf5;">
+<body>
 @if(!$athlete)
     <main class="app-shell" role="main">
         <div class="container" style="max-width:430px;margin:0 auto;padding:0;margin-bottom:80px;">
@@ -98,20 +98,6 @@
     </nav>
 </main>
 @endif
-<nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
-    <a href="{{ route('home') }}" class="navi-item" aria-label="Home">
-        <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
-    </a>
-    <a href="{{ route('training') }}" class="navi-item" aria-label="Training">
-        <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
-    </a>
-    <a href="{{ route('history') }}" class="navi-item" aria-label="History">
-        <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
-    </a>
-    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="navi-item active" aria-label="Profile">
-        <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
-    </a>
-</nav>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const stayLoggedInSwitch = document.getElementById('stayLoggedInSwitch');
