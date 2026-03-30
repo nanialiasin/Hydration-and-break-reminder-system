@@ -37,7 +37,7 @@
 
 <div class="container">
 
-    <a href="{{ url()->previous() }}" class="back-button">←</a>
+    <a href="{{ route('coach.creating') }}" class="back-button">←</a>
 
     <img src="{{ asset('images/hydrapulse-logo.svg') }}" 
          style="display:block; margin:0 auto 18px auto; width:180px; height:180px; border-radius:50%;">
