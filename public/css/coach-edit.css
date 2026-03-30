@@ -24,7 +24,7 @@ body {
 
 .content {
     flex: 1;
-    padding: 32px 22px 100px;
+    padding: 24px 14px 100px;
     overflow-y: auto;
 }
 
@@ -39,7 +39,7 @@ body {
 .card {
     background: #fff;
     border-radius: 16px;
-    padding: 24px;
+    padding: 18px;
     margin-bottom: 18px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -47,13 +47,16 @@ body {
 .profile-card {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 }
 
 .coach-avatar {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     display: flex;
+    flex-direction: column;
+    gap: 12px;
     justify-content: center;
+    align-items: center;
 }
 
 .coach-avatar img {
@@ -68,7 +71,7 @@ body {
 .coach-id-wrap {
     width: 100%;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .coach-id {
@@ -78,10 +81,33 @@ body {
     margin: 0;
 }
 
+.pic-upload-section {
+    width: auto;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    border-top: none !important;
+    padding-top: 0 !important;
+}
+
+#profile-pic-form {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    width: auto;
+    justify-content: center;
+    align-items: center;
+}
+
+#edit-form {
+    width: 100%;
+    display: block;
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     width: 100%;
 }
 
@@ -93,6 +119,8 @@ body {
 }
 
 .form-field {
+    width: 100%;
+    box-sizing: border-box;
     padding: 12px 14px;
     border: 1px solid #e5e7eb;
     border-radius: 10px;
@@ -131,7 +159,8 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 16px;
+    width: 100%;
 }
 
 .btn {
@@ -168,18 +197,9 @@ body {
     background-color: #d1d5db;
 }
 
-.pic-upload-section {
-    width: 100%;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
-    display: flex;
-    gap: 12px;
-}
-
 .btn-change-pic,
 .btn-save-pic {
-    flex: 1;
+    flex: 0 0 auto;
     padding: 10px 16px;
     border: none;
     border-radius: 10px;
@@ -214,10 +234,10 @@ body {
     background-color: #1d1f26;
     border-top: 1px solid #e5e7eb;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    gap: 32px;
-    padding: 10px 32px 8px 32px;
+    gap: 0;
+    padding: 10px 14px 8px;
     margin-top: auto;
 }
 
