@@ -4,16 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Athlete;
 use App\Models\TrainingSession;
+use Illuminate\Http\Request;
 
 class CoachDashboardController extends Controller
 {
     public function index()
     {
-        $coachId = auth()->check() ? auth()->user()->id : null;
-        
-        $activeAthletes = Athlete::where('status', 'active')->count();
-        $inactiveAthletes = Athlete::where('status', 'inactive')->count();
-        $totalAthletes = Athlete::count();
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Please log in to access this page.');
+        }
+        $coachId = auth()->user()->id;
+        $athletes = Athlete::where('created_by_coach', $coachId)->get();
+        $activeAthletes = $athletes->where('status', 'active')->count();
+        $inactiveAthletes = $athletes->where('status', 'inactive')->count();
+        $totalAthletes = $athletes->count();
+        $manualAthleteCount = $athletes->count();
+        $coachHasNotAddedAthletes = $manualAthleteCount == 0;
 
         // Initialize or update session durations for each intensity
         $intensityKeys = ['beginner', 'intermediate', 'advanced'];
@@ -41,12 +47,6 @@ class CoachDashboardController extends Controller
             'advanced_duration' => $sessionDurations['advanced'],
         ];
 
-        // Athletes created by the current coach
-        $athletes = $coachId ? Athlete::where('created_by_coach', $coachId)->get() : collect();
-        
-        // Available athletes (not created by any coach)
-        $availableAthletes = Athlete::whereNull('created_by_coach')->get();
-
         $intensityValues = [
             'beginner' => $session ? $session->beginner_duration : null,
             'intermediate' => $session ? $session->intermediate_duration : null,
@@ -62,10 +62,6 @@ class CoachDashboardController extends Controller
         }
 
         $averageIntensity = null;
-
-        $manualAthleteCount = $athletes->count();
-        $coachHasNotAddedAthletes = $manualAthleteCount == 0;
-
         // Only calculate averageIntensity if coach has added athletes
         if (!$coachHasNotAddedAthletes && $totalAthletes > 0) {
             $averageIntensity = round($totalIntensity / $totalAthletes);
@@ -80,8 +76,40 @@ class CoachDashboardController extends Controller
             'session',
             'averageIntensity',
             'coachHasNotAddedAthletes',
-            'athletes',
-            'availableAthletes'
+            'athletes'
         ));
+    }
+
+    public function storeAthlete(Request $request)
+    {
+        $request->validate([
+            'athlete_id' => 'required',
+            'name' => 'required',
+            'sport' => 'required',
+            'training_intensity' => 'required',
+            'status' => 'required',
+        ]);
+        $athlete = Athlete::where('athlete_id', $request->athlete_id)->first();
+        if ($athlete) {
+            // Update existing athlete
+            $athlete->update([
+                'name' => $request->name,
+                'sport' => $request->sport,
+                'intensity' => $request->training_intensity,
+                'status' => $request->status,
+                'created_by_coach' => $request->created_by_coach,
+            ]);
+        } else {
+            // Create new athlete
+            Athlete::create([
+                'athlete_id' => $request->athlete_id,
+                'name' => $request->name,
+                'sport' => $request->sport,
+                'intensity' => $request->training_intensity,
+                'status' => $request->status,
+                'created_by_coach' => $request->created_by_coach,
+            ]);
+        }
+        return redirect()->route('coach.creating')->with('success', 'Athlete added to your team overview!');
     }
 }

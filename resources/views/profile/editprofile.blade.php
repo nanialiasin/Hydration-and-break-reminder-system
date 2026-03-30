@@ -49,15 +49,36 @@
                     <input type="email" value="{{ $athlete?->email ?? Auth::user()->email ?? '' }}" class="field readonly" readonly>
                     <small class="text-danger">Email cannot be changed.</small>
                 </div>
-
-                <div class="input-group two-col">
-                    <div>
-                        <label>Weight (kg)</label>
-                        <input type="number" name="weight" value="{{ old('weight', $athlete?->weight ?? Auth::user()->weight ?? '') }}" class="field" step="0.1" min="1" required>
-                    </div>
-                    <div>
-                        <label>Height (cm)</label>
-                        <input type="number" name="height" value="{{ old('height', $athlete?->height ?? Auth::user()->height ?? '') }}" class="field" step="0.1" min="1" required>
+                <div class="input-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" name="weight" value="{{ old('weight', $athlete?->weight ?? Auth::user()->weight ?? '') }}" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+                </div>
+                <div class="input-group">
+                    <label>Height (cm)</label>
+                    <input type="number" name="height" value="{{ old('height', $athlete?->height ?? Auth::user()->height ?? '') }}" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+                </div>
+                <div class="input-group">
+                    <label>Status</label>
+                    <select name="status" class="form-control" style="width:100%;min-width:260px;max-width:340px;">
+                        <option value="active" {{ (old('status', $athlete?->status ?? 'active') == 'active') ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ (old('status', $athlete?->status ?? '') == 'inactive') ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="mb-3">Training Intensity</label>
+                    <div class="intensity-group d-flex justify-content-center gap-5">
+                        <div class="d-flex flex-column align-items-center mx-3">
+                            <input type="radio" name="intensity" value="Beginner" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Beginner') ? 'checked' : '' }}>
+                            <span class="mt-2">Beginner</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-center mx-3">
+                            <input type="radio" name="intensity" value="Intermediate" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Intermediate') ? 'checked' : '' }}>
+                            <span class="mt-2">Intermediate</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-center mx-3">
+                            <input type="radio" name="intensity" value="Advanced" {{ (old('intensity', $athlete?->intensity ?? Auth::user()->intensity ?? '') == 'Advanced') ? 'checked' : '' }}>
+                            <span class="mt-2">Advanced</span>
+                        </div>
                     </div>
                 </div>
 

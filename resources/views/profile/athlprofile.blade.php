@@ -7,7 +7,18 @@
     <link rel="stylesheet" href="{{ asset('css/athlprofile.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body style="background-color: #e9ecf5;">
+@if(!$athlete)
+    <main class="app-shell" role="main">
+        <div class="container" style="max-width:430px;margin:0 auto;padding:0;margin-bottom:80px;">
+            <div class="profile-title" style="font-size:28px;font-weight:bold;margin-bottom:20px;text-align:left;margin-left:0;">Profile</div>
+            <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);padding:24px 28px;margin-bottom:24px;background:#fff;position:relative;text-align:center;">
+                <h4>You have not created a profile yet.</h4>
+                <a href="{{ route('athletes.create') }}" class="btn btn-dark" style="margin-top:18px;">Create Profile</a>
+            </div>
+        </div>
+    </main>
+@else
 <main class="app-shell" role="main">
     <div class="content">
         <h1 class="profile-title">Profile</h1>
@@ -19,16 +30,22 @@
             <div class="athlete-id-wrap">
                 <h2 class="athlete-id">Athlete ID: {{ $athlete?->athlete_id ?? 'N/A' }}</h2>
             </div>
-
-            <div class="profile-info">
-                <div class="info-row"><span>Name</span><strong>{{ $athlete?->name ?? ($name ?? '') }}</strong></div>
-                <div class="info-row"><span>Email</span><strong>{{ $athlete?->email ?? ($email ?? '') }}</strong></div>
-                <div class="info-row"><span>Weight (kg)</span><strong>{{ $athlete?->weight ?? (isset($weight) ? $weight : '') }}</strong></div>
-                <div class="info-row"><span>Height (cm)</span><strong>{{ $athlete?->height ?? (isset($height) ? $height : '') }}</strong></div>
-                <div class="info-row"><span>BMI</span><strong>{{ $athlete?->bmi ?? ((isset($weight) && isset($height)) ? round($weight / pow($height / 100, 2), 2) : '') }}</strong></div>
-                <div class="info-row"><span>Sport</span><strong>{{ $athlete?->sport ?? ($sport ?? '') }}</strong></div>
-                <div class="info-row"><span>Training Intensity</span><strong>{{ $athlete?->intensity ?? ($training_intensity ?? '') }}</strong></div>
-                <div class="info-row"><span>Status</span><strong class="status-active">Active</strong></div>
+            <hr style="border:none; border-top:1.5px solid #e9ecf5; margin-bottom:18px; margin-top:0;">
+            <div style="font-size:16px;line-height:1.7;color:#222;">
+                <p><strong>Name:</strong> {{ $athlete?->name ?? ($name ?? '') }}</p>
+                <p><strong>Email:</strong> {{ $athlete?->email ?? ($email ?? '') }}</p>
+                <p><strong>Weight (kg):</strong> {{ $athlete?->weight ?? (isset($weight) ? $weight : '') }}</p>
+                <p><strong>Height (cm):</strong> {{ $athlete?->height ?? (isset($height) ? $height : '') }}</p>
+                <p><strong>BMI:</strong> {{ $athlete?->bmi ?? ((isset($weight) && isset($height)) ? round($weight / pow($height / 100, 2), 2) : '') }}</p>
+                <p><strong>Sport:</strong> {{ $athlete?->sport ?? ($sport ?? '') }}</p>
+                <p><strong>Training Intensity:</strong> {{ $athlete?->training_intensity ?? $athlete?->intensity ?? ($training_intensity ?? '') }}</p>
+                <p><strong>Status:</strong> 
+                    @if(($athlete?->status ?? $status ?? 'active') === 'inactive')
+                        <span class="status-inactive">Inactive</span>
+                    @else
+                        <span class="status-active">Active</span>
+                    @endif
+                </p>
             </div>
 
             <div class="edit-profile-row">
@@ -80,6 +97,21 @@
         </a>
     </nav>
 </main>
+@endif
+<nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
+    <a href="{{ route('home') }}" class="navi-item" aria-label="Home">
+        <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+    </a>
+    <a href="{{ route('training') }}" class="navi-item" aria-label="Training">
+        <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
+    </a>
+    <a href="{{ route('history') }}" class="navi-item" aria-label="History">
+        <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+    </a>
+    <a href="{{ route('profile.athlprofile', $athlete?->athlete_id) }}" class="navi-item active" aria-label="Profile">
+        <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+    </a>
+</nav>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const stayLoggedInSwitch = document.getElementById('stayLoggedInSwitch');

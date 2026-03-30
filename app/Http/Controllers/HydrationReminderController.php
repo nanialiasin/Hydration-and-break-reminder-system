@@ -158,7 +158,7 @@ class HydrationReminderController extends Controller
             'break_reminder' => $breakReminder,
         ]);
 
-        // Pass everything to the session blade
+        // Pass everything to the session blade (for athlete)
         return view('session', [
             'interval' => $intervalMinutes,
             'breakDuration' => $breakDuration,
