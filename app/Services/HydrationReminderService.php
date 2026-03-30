@@ -26,6 +26,15 @@ class HydrationReminderService
         return max($interval, 10);
     }
 
+    // Apply environmental stress adjustments on top of a configured base interval.
+    public function calculateAdjustedInterval(int $baseInterval, $temperature = 25, $humidity = 50, $durationMinutes = 30): int
+    {
+        $dynamicFromDefault = $this->calculateInterval($temperature, $humidity, $durationMinutes);
+        $deltaFromDefault = $dynamicFromDefault - 30;
+
+        return max($baseInterval + $deltaFromDefault, 5);
+    }
+
     public function calculateNextReminder($startTime, int $intervalMinutes): Carbon
     {
         return Carbon::parse($startTime)->addMinutes($intervalMinutes);

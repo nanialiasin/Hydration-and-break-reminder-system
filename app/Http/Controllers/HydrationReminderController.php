@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Models\HydrationSession;
 use App\Models\Athlete;
 use App\Models\Coach;
+use App\Models\HydrationSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -31,11 +32,20 @@ class HydrationReminderController extends Controller
     {
         $sensor = $this->getSensorReading();
 
-        // Calculate interval from current weather/session inputs.
-        $interval = $this->hydrationService->calculateInterval(
-            is_numeric($request->input('temperature')) ? (float) $request->input('temperature') : (float) $sensor['temperature'],
-            is_numeric($request->input('humidity')) ? (float) $request->input('humidity') : (float) $sensor['humidity'],
-            $request->input('duration', 60)
+        $temperature = is_numeric($request->input('temperature')) ? (float) $request->input('temperature') : (float) $sensor['temperature'];
+        $humidity = is_numeric($request->input('humidity')) ? (float) $request->input('humidity') : (float) $sensor['humidity'];
+        $durationMinutes = (int) $request->input('duration', 60);
+
+        $intensity = $this->normalizeIntensity((string) $request->input('intensity', ''));
+        $hydrationSetting = $this->findHydrationSettingByIntensity($intensity);
+        $baseReminder = (int) ($hydrationSetting?->hydration_reminder ?? 30);
+
+        // Use intensity setting as baseline and tune with environment.
+        $interval = $this->hydrationService->calculateAdjustedInterval(
+            $baseReminder,
+            $temperature,
+            $humidity,
+            $durationMinutes
         );
 
         // Compute next reminder timestamp.
@@ -57,7 +67,7 @@ class HydrationReminderController extends Controller
         // Coach flow: create to-do sessions for managed athletes.
         if ($user && $user->role === 'coach') {
             $sport = (string) $request->input('sport', 'General Training');
-            $intensity = (string) $request->input('intensity', 'beginner');
+            $intensity = $this->normalizeIntensity((string) $request->input('intensity', 'beginner'));
             $totalDuration = ((int) $request->input('hours', 0) * 60) + (int) $request->input('minutes', 0);
 
             if ($totalDuration <= 0) {
@@ -79,6 +89,9 @@ class HydrationReminderController extends Controller
                 return redirect()->route('coach.creating')->with('error', 'No athletes found to assign this session.');
             }
 
+            $coachSetting = $this->findHydrationSettingByIntensity($intensity);
+            $coachReminderInterval = (int) ($coachSetting?->hydration_reminder ?? 20);
+
             $createdCount = 0;
 
             foreach ($athletes as $athlete) {
@@ -92,7 +105,7 @@ class HydrationReminderController extends Controller
                     'actual_duration_seconds' => 0,
                     'temperature' => 32,
                     'humidity' => 74,
-                    'reminder_interval_minutes' => 20,
+                    'reminder_interval_minutes' => $coachReminderInterval,
                     'alerts' => 0,
                     'followed' => 0,
                     'ignored' => 0,
@@ -113,7 +126,7 @@ class HydrationReminderController extends Controller
 
         // Read selected training options.
         $sport = (string) $request->input('sport', 'General Training');
-        $intensity = (string) $request->input('intensity', 'beginner');
+        $intensity = $this->normalizeIntensity((string) $request->input('intensity', 'beginner'));
         $totalDuration = ((int) $request->input('hours', 0) * 60) + (int) $request->input('minutes', 0);
 
         if ($totalDuration <= 0) {
@@ -121,18 +134,18 @@ class HydrationReminderController extends Controller
         }
 
         // Fetch hydration settings for the selected intensity
-        $hydrationSetting = \App\Models\HydrationSetting::where('intensity', $intensity)->first();
+        $hydrationSetting = $this->findHydrationSettingByIntensity($intensity);
         $defaultReminder = $hydrationSetting ? $hydrationSetting->hydration_reminder : 20;
         $breakDuration = $hydrationSetting ? $hydrationSetting->break_duration : 5;
         $breakReminder = $hydrationSetting ? $hydrationSetting->break_reminder : 15;
 
-        // Logic: Calculate the smart interval
-        $intervalMinutes = $this->hydrationService->calculateInterval($temperature, $humidity, $totalDuration);
-
-        // Use configured fallback reminder if the computed value is invalid.
-        if ($intervalMinutes <= 0) {
-            $intervalMinutes = $defaultReminder;
-        }
+        // Use intensity setting as baseline and tune with environment.
+        $intervalMinutes = $this->hydrationService->calculateAdjustedInterval(
+            (int) $defaultReminder,
+            $temperature,
+            $humidity,
+            $totalDuration
+        );
 
         // Save active session details for later completion.
         $assignedSessionId = $request->input('assigned_session_id');
@@ -169,6 +182,22 @@ class HydrationReminderController extends Controller
             'sport' => $sport,
             'intensity' => $intensity,
         ]);
+    }
+
+    private function normalizeIntensity(string $intensity): string
+    {
+        $normalized = strtolower(trim($intensity));
+
+        return in_array($normalized, ['beginner', 'intermediate', 'advanced'], true)
+            ? $normalized
+            : 'beginner';
+    }
+
+    private function findHydrationSettingByIntensity(string $intensity): ?HydrationSetting
+    {
+        return HydrationSetting::query()
+            ->whereRaw('LOWER(intensity) = ?', [$this->normalizeIntensity($intensity)])
+            ->first();
     }
 
     // Endpoint for Arduino/bridge to push latest sensor values.
@@ -408,18 +437,26 @@ class HydrationReminderController extends Controller
     // History page with all completed sessions.
     public function showHistory()
     {
-        $query = HydrationSession::query()
-            ->whereNotNull('completed_at');
-
         $user = auth()->user();
-        $athlete = null;
 
-        if ($user && $user->role === 'athlete') {
-            $athlete = Athlete::where('email', $user->email)->first();
-            if ($athlete) {
-                $query->where('athlete_id', $athlete->athlete_id);
-            }
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please log in to view your history.');
         }
+
+        $athlete = Athlete::where('email', $user->email)->first();
+
+        // If there is no athlete profile linked to this account,
+        // never fall back to global history.
+        if (!$athlete) {
+            return view('history', [
+                'sessions' => collect(),
+                'athlete' => null,
+            ]);
+        }
+
+        $query = HydrationSession::query()
+            ->whereNotNull('completed_at')
+            ->where('athlete_id', $athlete->athlete_id);
 
         // Build display-friendly session list.
         $sessions = $query
