@@ -89,29 +89,30 @@ class CoachController extends Controller
 
         $athleteIds = $athletes->pluck('athlete_id')->filter()->unique()->values();
 
-        $sessions = HydrationSession::query()
+        $tasks = HydrationSession::query()
+            ->selectRaw(
+                'sport,
+                 intensity,
+                 planned_duration_minutes,
+                 COUNT(*) as total_athletes,
+                 SUM(CASE WHEN completed_at IS NOT NULL THEN 1 ELSE 0 END) as completed_athletes,
+                 SUM(CASE WHEN started_at IS NOT NULL AND completed_at IS NULL THEN 1 ELSE 0 END) as in_progress_athletes,
+                 MAX(id) as latest_id'
+            )
             ->where('assigned_by_coach', true)
-            ->whereNull('started_at')
-            ->whereNull('completed_at')
-            ->whereIn('athlete_id', $athleteIds)
-            ->latest('id')
-            ->get();
-
-        $athleteNames = $athletes->pluck('name', 'athlete_id')->toArray();
-
-        $completedCounts = HydrationSession::query()
-            ->selectRaw('sport, intensity, planned_duration_minutes, COUNT(*) as completed_count')
-            ->where('assigned_by_coach', true)
-            ->whereNotNull('completed_at')
             ->whereIn('athlete_id', $athleteIds)
             ->groupBy('sport', 'intensity', 'planned_duration_minutes')
-            ->get()
-            ->mapWithKeys(function ($row) {
-                $key = strtolower((string) $row->sport) . '|' . strtolower((string) $row->intensity) . '|' . (int) $row->planned_duration_minutes;
-                return [$key => (int) $row->completed_count];
-            })
-            ->toArray();
+            ->orderByDesc('latest_id')
+            ->get();
 
-        return view('coach.in-progress', compact('sessions', 'athleteNames', 'completedCounts'));
+        $pendingTasks = $tasks->filter(function ($task) {
+            return (int) $task->completed_athletes < (int) $task->total_athletes;
+        })->values();
+
+        $completedTasks = $tasks->filter(function ($task) {
+            return (int) $task->completed_athletes >= (int) $task->total_athletes;
+        })->values();
+
+        return view('coach.in-progress', compact('pendingTasks', 'completedTasks'));
     }
 }

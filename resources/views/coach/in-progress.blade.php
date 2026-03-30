@@ -11,37 +11,66 @@
     <div class="content">
         <h1 class="page-title">Coach Sessions</h1>
 
-        <section class="list-wrap" aria-label="In progress sessions">
-            @forelse(($sessions ?? collect()) as $session)
-                @php
-                    $taskKey = strtolower((string) ($session->sport ?? '')) . '|' . strtolower((string) ($session->intensity ?? '')) . '|' . (int) ($session->planned_duration_minutes ?? 0);
-                    $doneCount = $completedCounts[$taskKey] ?? 0;
-                @endphp
+        <section class="list-wrap" aria-label="Pending sessions">
+            <h2 class="section-title">Pending Tasks</h2>
+            @forelse(($pendingTasks ?? collect()) as $task)
                 <article class="session-card">
                     <div class="row">
                         <span class="label">Status</span>
-                        <span class="value">{{ $session->started_at ? 'In Progress' : 'Pending' }}</span>
+                        <span class="value">{{ (int) ($task->in_progress_athletes ?? 0) > 0 ? 'In Progress' : 'Pending' }}</span>
                     </div>
                     <div class="row">
                         <span class="label">Sport</span>
-                        <span class="value">{{ ucfirst($session->sport ?? 'General Training') }}</span>
+                        <span class="value">{{ ucfirst($task->sport ?? 'General Training') }}</span>
                     </div>
                     <div class="row">
                         <span class="label">Intensity</span>
-                        <span class="value">{{ ucfirst($session->intensity ?? 'Beginner') }}</span>
+                        <span class="value">{{ ucfirst($task->intensity ?? 'Beginner') }}</span>
                     </div>
                     <div class="row">
                         <span class="label">Planned</span>
-                        <span class="value">{{ (int)($session->planned_duration_minutes ?? 0) }} min</span>
+                        <span class="value">{{ (int)($task->planned_duration_minutes ?? 0) }} min</span>
                     </div>
                     <div class="row">
                         <span class="label">Completed Athletes</span>
-                        <span class="value">{{ $doneCount }}</span>
+                        <span class="value">{{ (int)($task->completed_athletes ?? 0) }} / {{ (int)($task->total_athletes ?? 0) }}</span>
                     </div>
                 </article>
             @empty
                 <article class="session-card empty">
                     <p>No pending or in-progress sessions right now.</p>
+                </article>
+            @endforelse
+        </section>
+
+        <section class="list-wrap" aria-label="Completed sessions" style="margin-top:14px;">
+            <h2 class="section-title">Completed Tasks</h2>
+            @forelse(($completedTasks ?? collect()) as $task)
+                <article class="session-card">
+                    <div class="row">
+                        <span class="label">Status</span>
+                        <span class="value">Completed</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Sport</span>
+                        <span class="value">{{ ucfirst($task->sport ?? 'General Training') }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Intensity</span>
+                        <span class="value">{{ ucfirst($task->intensity ?? 'Beginner') }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Planned</span>
+                        <span class="value">{{ (int)($task->planned_duration_minutes ?? 0) }} min</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Completed Athletes</span>
+                        <span class="value">{{ (int)($task->completed_athletes ?? 0) }} / {{ (int)($task->total_athletes ?? 0) }}</span>
+                    </div>
+                </article>
+            @empty
+                <article class="session-card empty">
+                    <p>No fully completed tasks yet.</p>
                 </article>
             @endforelse
         </section>
