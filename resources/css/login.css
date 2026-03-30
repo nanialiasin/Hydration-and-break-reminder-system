@@ -11,14 +11,14 @@ body {
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background: #ececec;
+    background: #4a4d54;
     padding: 18px;
 }
 
 .shell {
     width: min(460px, 100%);
     min-height: min(880px, 95vh);
-    border-radius: 18px;
+    border-radius: 10px;
     background: #cfd2db;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
     padding: 56px 26px 34px;
