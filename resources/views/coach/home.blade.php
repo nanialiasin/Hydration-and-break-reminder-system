@@ -27,34 +27,17 @@
             </div>
         </section>
 
-        <div class="training-card">
-            Today's Training Time :
-        </div>
-
-        <div class="card">
-            <div class="card-title">Team Overview :</div>
-            <p>Total Athletes : {{ $totalAthletes }}</p>
-            <p>Checked-in : {{ $checkedIn }}</p>
-            <p>Not Checked-in : {{ $notCheckedIn }}</p>
-            <hr>
-            <div style="margin-top:10px;">
-                <strong>Team Members:</strong>
-                <ul style="padding-left:18px;">
-                    @forelse($athletes as $athlete)
-                        <li>
-                            {{ $athlete->name }} (ID: {{ $athlete->athlete_id }}) - {{ $athlete->sport }} | Status: {{ $athlete->status }}
-                        </li>
-                    @empty
-                        <li>No athletes in your team yet.</li>
-                    @endforelse
-                </ul>
+        <section class="summary-card">
+            <h2 class="card-title">Team Summary</h2>
+            <div class="summary-item">
+                <span class="summary-label">Average Intensity</span>
+                <span class="summary-value">{{ $averageIntensity ?? 'N/A' }}</span>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Recent Activities :</div>
-            <p>No recent activity.</p>
-        </div>
+            <div class="summary-item">
+                <span class="summary-label">Last Updated</span>
+                <span class="summary-value">{{ $lastUpdated ?? 'N/A' }}</span>
+            </div>
+        </section>
 
         <section class="actions-card">
             <h2 class="card-title">Quick Actions</h2>
