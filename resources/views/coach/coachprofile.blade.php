@@ -14,7 +14,10 @@
 
         <section class="card profile-card">
             <div class="coach-avatar">
-                <img src="{{ asset('storage/profile_pics/' . $coach->profile_pic) }}">
+                <img src="{{ $coach->profile_pic && $coach->profile_pic !== 'default.jpg'
+                    ? asset('storage/profile_pics/' . $coach->profile_pic)
+                    : asset('images/default.jpg') }}"
+                    alt="Profile Picture" width="120" height="120">
             </div>
             <div class="coach-id-wrap">
                 <h2 class="coach-id">Coach ID: {{ $coach->coach_id ?? 'N/A' }}</h2>
