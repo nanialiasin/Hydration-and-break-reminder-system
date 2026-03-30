@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Athlete;
+use App\Models\Coach;
+use App\Models\HydrationSession;
 use App\Models\TrainingSession;
 use Illuminate\Http\Request;
 
@@ -101,7 +103,7 @@ class CoachDashboardController extends Controller
             ]);
         } else {
             // Create new athlete
-            Athlete::create([
+            $athlete = Athlete::create([
                 'athlete_id' => $request->athlete_id,
                 'name' => $request->name,
                 'sport' => $request->sport,
@@ -110,6 +112,84 @@ class CoachDashboardController extends Controller
                 'created_by_coach' => $request->created_by_coach,
             ]);
         }
+
+        if ($athlete && auth()->check()) {
+            $this->assignPendingCoachSessionsToAthlete(auth()->user(), $athlete);
+        }
+
         return redirect()->route('coach.creating')->with('success', 'Athlete added to your team overview!');
+    }
+
+    private function assignPendingCoachSessionsToAthlete($coachUser, Athlete $athlete): int
+    {
+        $coachCode = Coach::where('email', $coachUser->email)->value('coach_id');
+
+        $coachAthleteIds = Athlete::query()
+            ->where(function ($query) use ($coachUser, $coachCode) {
+                $query->where('created_by_coach', (string) $coachUser->id)
+                      ->orWhere('created_by_coach', $coachUser->id);
+
+                if (!empty($coachCode)) {
+                    $query->orWhere('created_by_coach', $coachCode);
+                }
+            })
+            ->where('athlete_id', '!=', $athlete->athlete_id)
+            ->pluck('athlete_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($coachAthleteIds->isEmpty()) {
+            return 0;
+        }
+
+        $pendingTemplates = HydrationSession::query()
+            ->where('assigned_by_coach', true)
+            ->whereNull('started_at')
+            ->whereNull('completed_at')
+            ->whereIn('athlete_id', $coachAthleteIds)
+            ->latest('id')
+            ->get();
+
+        $assignedCount = 0;
+
+        foreach ($pendingTemplates as $template) {
+            $alreadyExists = HydrationSession::query()
+                ->where('athlete_id', $athlete->athlete_id)
+                ->where('assigned_by_coach', true)
+                ->whereNull('started_at')
+                ->whereNull('completed_at')
+                ->where('sport', $template->sport)
+                ->where('intensity', $template->intensity)
+                ->where('planned_duration_minutes', $template->planned_duration_minutes)
+                ->exists();
+
+            if ($alreadyExists) {
+                continue;
+            }
+
+            HydrationSession::create([
+                'athlete_id' => $athlete->athlete_id,
+                'coach_id' => $template->coach_id ?: (string) $coachUser->id,
+                'assigned_by_coach' => true,
+                'sport' => $template->sport,
+                'intensity' => $template->intensity,
+                'planned_duration_minutes' => (int) ($template->planned_duration_minutes ?? 0),
+                'actual_duration_seconds' => 0,
+                'temperature' => $template->temperature,
+                'humidity' => $template->humidity,
+                'reminder_interval_minutes' => $template->reminder_interval_minutes,
+                'alerts' => 0,
+                'followed' => 0,
+                'ignored' => 0,
+                'hydration_score' => 0,
+                'started_at' => null,
+                'completed_at' => null,
+            ]);
+
+            $assignedCount++;
+        }
+
+        return $assignedCount;
     }
 }
