@@ -10,6 +10,10 @@
             font-family: 'Poppins', Arial, sans-serif !important;
         }
 
+        body {
+            background-color: #4a4d54 !important;
+        }
+
         .status-active {
             color: green;
             font-weight: 600;
@@ -62,6 +66,32 @@
         <button type="submit" class="remove-btn">Remove Athlete</button>
 
     </form>
+
+    <div style="margin-top: 24px;">
+        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: #111827;">Your Athletes</h2>
+        @if(isset($coachAthletes) && $coachAthletes->count() > 0)
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                @foreach($coachAthletes as $athlete)
+                    <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #111827;">{{ $athlete->name }}</div>
+                            <div style="font-size: 12px; color: #6b7280;">ID: {{ $athlete->athlete_id }} • {{ $athlete->sport ?? 'N/A' }} • {{ $athlete->status ?? 'active' }}</div>
+                        </div>
+                        <form method="POST" action="{{ route('athletes.destroy.byid') }}" style="margin: 0;" onsubmit="return confirm('Remove this athlete from your list?');">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="athlete_id" value="{{ $athlete->athlete_id }}">
+                            <button type="submit" class="remove-btn" style="padding: 8px 10px; font-size: 12px;">Remove</button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; color: #6b7280; font-size: 14px;">
+                No athletes in your list.
+            </div>
+        @endif
+    </div>
 
 </div>
 

@@ -64,7 +64,3 @@
         <a href="{{ route('coach.profile') }}" class="nav-item" aria-label="Profile">
             <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
         </a>
-    </nav>
-</main>
-</body>
-</html>

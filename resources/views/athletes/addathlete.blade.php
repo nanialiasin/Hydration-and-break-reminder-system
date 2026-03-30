@@ -9,6 +9,9 @@
         body, h1, h2, h3, p, span {
             font-family: 'Poppins', Arial, sans-serif !important;
         }
+        body {
+            background-color: #4a4d54 !important;
+        }
     </style>
 </head>
 <body>
@@ -54,6 +57,31 @@
         <button type="submit">Confirm Add</button>
 
     </form>
+
+    <div style="margin-top: 32px;">
+        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: white;">Available Athletes</h2>
+        @if(isset($availableAthletes) && $availableAthletes && $availableAthletes->count() > 0)
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                @foreach($availableAthletes as $athlete)
+                    <div style="background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px;">{{ $athlete->name }}</div>
+                            <div style="font-size: 12px; color: #666;">ID: {{ $athlete->athlete_id }} • {{ $athlete->sport ?? 'N/A' }} • {{ $athlete->status ?? 'active' }}</div>
+                        </div>
+                        <form action="{{ route('athletes.add.byid') }}" method="POST" style="margin: 0;">
+                            @csrf
+                            <input type="hidden" name="athlete_id" value="{{ $athlete->athlete_id }}">
+                            <button type="submit" style="background: #007bff; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;">Add</button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div style="background: white; border: 1px solid #ddd; border-radius: 10px; padding: 14px; color: #666; font-size: 14px;">
+                No untaken athletes available right now.
+            </div>
+        @endif
+    </div>
 
 </div>
 

@@ -47,6 +47,22 @@
                 </div>
             </section>
 
+            @if(isset($athletes) && $athletes && $athletes->count() > 0)
+            <section class="card" style="margin-top: 16px;">
+                <h2 class="card-title">Athletes</h2>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    @foreach($athletes as $athlete)
+                        <div style="background: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 14px;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px;">{{ $athlete->name }}</div>
+                                <div style="font-size: 12px; color: #666;">{{ $athlete->sport ?? 'N/A' }} • {{ $athlete->status ?? 'active' }}</div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+            @endif
+
             <section class="card session-card">
                 <h2 class="card-title">Session</h2>
                 @if($session && $session->sport)
