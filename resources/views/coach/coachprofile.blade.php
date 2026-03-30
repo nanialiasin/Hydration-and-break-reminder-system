@@ -14,7 +14,7 @@
 
         <section class="card profile-card">
             <div class="coach-avatar">
-                <img src="{{ $coach?->profile_pic && $coach?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $coach->profile_pic) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
+                <img src="{{ $coach->profile_pic ? asset('storage/' . $coach->profile_pic) : asset('images/default.jpg') }}" alt="Profile Picture" width="120" height="120">
             </div>
             <div class="coach-id-wrap">
                 <h2 class="coach-id">Coach ID: {{ $coach->coach_id ?? 'N/A' }}</h2>
@@ -74,7 +74,7 @@
         </a>
     </nav>
 </main>
-<nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
+<!-- <nav class="nav-bar" aria-label="Main navigation" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100vw);z-index:1000;display:flex;justify-content:space-between;align-items:center;background:#000;border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,0.08);padding:10px 32px 8px 32px;max-width:100vw;border-top:1.5px solid #e0e7ef;margin:0;">
     <a href="{{ route('coach.home') }}" class="navi-item" aria-label="Home">
         <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
     </a>
@@ -90,6 +90,6 @@
     <a href="{{ route('coach.profile') }}" class="navi-item active" aria-label="Profile">
         <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
     </a>
-</nav>
+</nav> -->
 </body>
 </html>

@@ -238,7 +238,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/coach/profile/update/{id}', [CoachProfileController::class, 'update'])->name('coach.update');
     Route::delete('/coach/delete/{id}', [CoachProfileController::class, 'destroy'])->name('coach.delete');
     Route::post('/coach/stayloggedin/{id}', [CoachProfileController::class, 'updateStayLoggedIn'])->name('coach.stayloggedin');
-    Route::post('/coach/update-pic/{id}', [App\Http\Controllers\CoachProfileController::class, 'updateProfilePic'])->name('coach.updatePic');
+    Route::post('/coach/update-pic/{id}', [CoachProfileController::class, 'updateProfilePic'])->name('coach.updatePic');
     Route::post('/coach/addathlete', [App\Http\Controllers\CoachDashboardController::class, 'storeAthlete'])
         ->name('coach.addathlete.store');
 });

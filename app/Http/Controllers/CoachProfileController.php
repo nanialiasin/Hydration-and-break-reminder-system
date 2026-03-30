@@ -81,17 +81,28 @@ class CoachProfileController extends Controller
 
     public function updateProfilePic(Request $request, $id)
     {
+        $request->validate([
+            'profile_pic' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
         $coach = Coach::findOrFail($id);
+
         if ($request->hasFile('profile_pic')) {
             $file = $request->file('profile_pic');
             $filename = uniqid('coach_') . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/profile_pics', $filename);
+
+            // Delete old profile pic if not default
+            if ($coach->profile_pic && $coach->profile_pic !== 'default.jpg') {
+                \Storage::delete('public/profile_pics/' . $coach->profile_pic);
+            }
+
             $coach->profile_pic = $filename;
             $coach->save();
         }
-        return redirect()->route('coach.edit', $coach->id)->with('success', 'Profile picture updated!');
-    }
 
+    return redirect()->route('coach.profile')->with('success', 'Profile picture updated!');
+}
     public function destroy($id)
     {
         $coach = Coach::findOrFail($id);
