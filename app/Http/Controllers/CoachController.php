@@ -11,12 +11,18 @@ class CoachController extends Controller
     public function index()
     {
         $coachId = auth()->user()->id;
-        $totalAthletes = Athlete::where('created_by_coach', $coachId)->count();
-        $checkedIn = Athlete::where('created_by_coach', $coachId)->where('status', 'checked_in')->count();
-        $notCheckedIn = Athlete::where('created_by_coach', $coachId)->where('status', 'checked_out')->count();
+        $athletes = Athlete::where('created_by_coach', $coachId)->get();
+        $totalAthletes = $athletes->count();
+        $activeAthletes = $athletes->where('status', 'active')->count();
+        $inactiveAthletes = $athletes->where('status', 'inactive')->count();
+        $checkedIn = $athletes->where('status', 'checked_in')->count();
+        $notCheckedIn = $athletes->where('status', 'checked_out')->count();
 
         return view('coach.home', compact(
+            'athletes',
             'totalAthletes',
+            'activeAthletes',
+            'inactiveAthletes',
             'checkedIn',
             'notCheckedIn'
         ));

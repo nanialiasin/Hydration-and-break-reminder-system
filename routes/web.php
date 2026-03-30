@@ -32,10 +32,24 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
             if ($athlete && $athlete->athlete_id) {
                 return redirect()->route('profile.athlprofile', ['athlete_id' => $athlete->athlete_id]);
             } else {
-                return redirect()->route('athletes.create', [
-                    'name' => $user->name,
-                    'email' => $user->email
-                ]);
+                // If athlete profile no longer exists, invalidate this auth account
+                // so the same email must sign up again before using the app.
+                $email = $user->email;
+                $name = $user->name;
+                $userId = $user->id;
+
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                \App\Models\User::where('id', $userId)->delete();
+
+                return redirect()->route('register')
+                    ->withErrors(['email' => 'This athlete account no longer exists. Please sign up again.'])
+                    ->withInput([
+                        'name' => $name,
+                        'email' => $email,
+                    ]);
             }
         } else {
             return redirect('/home');
@@ -165,9 +179,7 @@ Route::get('/athletes/fetch/{athlete_id}', [AthleteController::class, 'fetch'])-
 Route:: get('/athletes', [AthleteController::class, 'create'])->name('athletes.create');
 Route::post('/athletes', [AthleteController::class, 'store'])->name('athletes.store');
 
-Route::get('/athletes/addathlete', function () {
-    return view('athletes.addathlete');
-})->name('athletes.addathlete');
+Route::get('/athletes/addathlete', [AthleteController::class, 'addAthleteShowPage'])->name('athletes.addathlete');
 Route::post('/athletes/addathlete', [AthleteController::class, 'addById'])->name('athletes.add.byid');
 
 Route::get('/athletes/remove', [AthleteController::class, 'removePage'])->name('athletes.remove');

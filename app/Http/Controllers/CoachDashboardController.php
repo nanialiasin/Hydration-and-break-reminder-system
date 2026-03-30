@@ -9,6 +9,8 @@ class CoachDashboardController extends Controller
 {
     public function index()
     {
+        $coachId = auth()->check() ? auth()->user()->id : null;
+        
         $activeAthletes = Athlete::where('status', 'active')->count();
         $inactiveAthletes = Athlete::where('status', 'inactive')->count();
         $totalAthletes = Athlete::count();
@@ -39,7 +41,11 @@ class CoachDashboardController extends Controller
             'advanced_duration' => $sessionDurations['advanced'],
         ];
 
-        $athletes = Athlete::all();
+        // Athletes created by the current coach
+        $athletes = $coachId ? Athlete::where('created_by_coach', $coachId)->get() : collect();
+        
+        // Available athletes (not created by any coach)
+        $availableAthletes = Athlete::whereNull('created_by_coach')->get();
 
         $intensityValues = [
             'beginner' => $session ? $session->beginner_duration : null,
@@ -57,7 +63,7 @@ class CoachDashboardController extends Controller
 
         $averageIntensity = null;
 
-        $manualAthleteCount = Athlete::whereNotNull('created_by_coach')->count();
+        $manualAthleteCount = $athletes->count();
         $coachHasNotAddedAthletes = $manualAthleteCount == 0;
 
         // Only calculate averageIntensity if coach has added athletes
@@ -73,7 +79,9 @@ class CoachDashboardController extends Controller
             'totalAthletes',
             'session',
             'averageIntensity',
-            'coachHasNotAddedAthletes'
+            'coachHasNotAddedAthletes',
+            'athletes',
+            'availableAthletes'
         ));
     }
 }

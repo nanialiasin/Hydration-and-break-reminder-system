@@ -115,7 +115,23 @@ class AthleteController extends Controller
 
     public function removePage()
     {
-        return view('athletes.remove');
+        $coachId = auth()->check() ? auth()->user()->id : null;
+        $coachAthletes = $coachId
+            ? Athlete::where('created_by_coach', $coachId)->get()
+            : collect();
+
+        return view('athletes.remove', compact('coachAthletes'));
+    }
+
+    public function addAthleteShowPage()
+    {
+        $availableAthletes = Athlete::where(function ($query) {
+            $query->whereNull('created_by_coach')
+                ->orWhere('created_by_coach', '')
+                ->orWhere('created_by_coach', '0')
+                ->orWhere('created_by_coach', 0);
+        })->get();
+        return view('athletes.addathlete', compact('availableAthletes'));
     }
 
     public function destroyById(Request $request)
@@ -126,10 +142,15 @@ class AthleteController extends Controller
             return back()->with('error', 'Athlete not found.');
         }
 
-        // Delete athlete and all related data (cascades through model)
-        $athlete->delete();
+        if (is_null($athlete->created_by_coach) || $athlete->created_by_coach === '' || (string) $athlete->created_by_coach === '0') {
+            return back()->with('success', 'Athlete is already in the untaken list.');
+        }
 
-        return back()->with('success', 'Athlete and all associated data removed successfully.');
+        // Remove athlete from current coach list and return to untaken pool.
+        $athlete->created_by_coach = null;
+        $athlete->save();
+
+        return back()->with('success', 'Athlete removed from your list and returned to untaken athletes.');
     }
 
     public function edit($athlete_id)
