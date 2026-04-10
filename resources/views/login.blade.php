@@ -20,7 +20,7 @@
         <p class="subtitle">Welcome Back Coach!</p>
         <p class="subtitle">Ready For Training?</p>
 
-        <form method="get" action="{{ route('streak') }}">
+        <form method="POST" action="{{ route('login') }}">
             @csrf
             <input class="field" id="email" type="email" name="email" placeholder="Email" autocomplete="email">
             <input class="field" id="password" type="password" name="password" placeholder="Password" autocomplete="current-password">

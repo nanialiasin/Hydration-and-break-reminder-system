@@ -62,14 +62,17 @@
     </div>
 
     <script>
+        // --- Config from backend and routes ---
         const intervalMinutes = {{ $interval ?? 20 }};
         const totalDurationMinutes = {{ $totalDuration ?? 30 }};
         const hydrationAlertUrl = "{{ route('hydration.alert') }}";
         const sessionStateStorageKey = 'hydrationActiveSession';
 
+        // --- Reminder/timer setup ---
         const intervalSeconds = 10;
         let totalSessionSeconds = Math.max(60, totalDurationMinutes * 60);
 
+        // --- Live session state ---
         let remainingSessionSeconds = totalSessionSeconds;
         let reminderSeconds = intervalSeconds;
         let alerts = 0;
@@ -79,6 +82,7 @@
         let pendingReminder = false;
         let lastTickAt = Date.now();
 
+        // --- DOM references ---
         const timerElement = document.getElementById('sessionTimer');
 
         const alertsInput = document.getElementById('alertsInput');
@@ -87,10 +91,12 @@
         const durationSecondsInput = document.getElementById('durationSecondsInput');
         const sessionForm = document.querySelector('.session-actions');
 
+        // --- Query params from hydration alert page ---
         const urlParams = new URLSearchParams(window.location.search);
         const hydrationAction = urlParams.get('hydration_action');
         const shouldResumeFromAlert = Boolean(hydrationAction);
 
+        // --- Save current session state ---
         const persistState = () => {
             const state = {
                 totalSessionSeconds,
@@ -107,6 +113,7 @@
             sessionStorage.setItem(sessionStateStorageKey, JSON.stringify(state));
         };
 
+        // --- Restore session state after alert navigation ---
         const hydrateState = () => {
             const raw = sessionStorage.getItem(sessionStateStorageKey);
 
@@ -141,12 +148,14 @@
             }
         };
 
+        // --- Resume or reset session state ---
         if (shouldResumeFromAlert) {
             hydrateState();
         } else {
             sessionStorage.removeItem(sessionStateStorageKey);
         }
 
+        // --- Apply follow/snooze action and clean URL ---
         if (pendingReminder && hydrationAction) {
             if (hydrationAction === 'followed') {
                 followed++;
@@ -162,6 +171,7 @@
             window.history.replaceState({}, '', cleanedUrl);
         }
 
+        // --- Helper: format seconds to HH:MM:SS ---
         const formatTime = (valueSeconds) => {
             const h = Math.floor(valueSeconds / 3600);
             const m = Math.floor((valueSeconds % 3600) / 60);
@@ -170,6 +180,7 @@
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         };
 
+        // --- Keep hidden form stats synced ---
         const syncStatsToForm = () => {
             const elapsedByClock = Math.floor((Date.now() - sessionStartedAt) / 1000);
             const elapsedByTimer = totalSessionSeconds - remainingSessionSeconds;
@@ -183,9 +194,11 @@
             persistState();
         };
 
+        // --- Initial UI render ---
         timerElement.textContent = formatTime(remainingSessionSeconds);
         syncStatsToForm();
 
+        // --- Main countdown loop (1 second tick) ---
         const countdown = setInterval(() => {
             if (remainingSessionSeconds <= 0) {
                 clearInterval(countdown);
@@ -193,9 +206,11 @@
                 return;
             }
 
+            // Count down session and reminder timers
             remainingSessionSeconds--;
             reminderSeconds--;
 
+            // Trigger hydration reminder when reminder timer ends
             if (reminderSeconds <= 0 && remainingSessionSeconds > 0) {
                 alerts++;
                 reminderSeconds = intervalSeconds;
@@ -205,10 +220,12 @@
                 return;
             }
 
+            // Update timer display and state each tick
             timerElement.textContent = formatTime(remainingSessionSeconds);
             syncStatsToForm();
         }, 1000);
 
+        // --- Final sync and cleanup when ending session ---
         sessionForm.addEventListener('submit', () => {
             syncStatsToForm();
             sessionStorage.removeItem(sessionStateStorageKey);

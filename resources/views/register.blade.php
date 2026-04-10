@@ -14,6 +14,16 @@
             <h1>Create Account</h1>
             <p class="lead">Fill your information below.</p>
 
+            @if ($errors->any())
+                <div class="alert alert-danger" style="margin-bottom: 10px;">
+                    <ul style="margin-bottom: 0;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form method="post" action="{{ route('register') }}">
                 @csrf
                 <input class="field" type="text" name="name" placeholder="Name" autocomplete="name">
@@ -23,8 +33,8 @@
 
                 <p class="role-label">Select Role :</p>
                 <div class="roles">
-                    <label><input type="radio" name="role" value="coach"> Coach</label>
-                    <label><input type="radio" name="role" value="athlete" checked> Athlete</label>
+                    <label><input type="radio" name="role" value="coach" required> Coach</label>
+                    <label><input type="radio" name="role" value="athlete" required> Athlete</label>
                 </div>
 
                 <button class="submit" type="submit">Sign Up</button>
