@@ -36,27 +36,47 @@ class HydrationReminderController extends Controller
         $humidity = is_numeric($request->input('humidity')) ? (float) $request->input('humidity') : (float) $sensor['humidity'];
         $durationMinutes = (int) $request->input('duration', 60);
 
+        $weightKg = null;
+        if (is_numeric($request->input('weight'))) {
+            $weightKg = (int) $request->input('weight');
+        } elseif ($user = auth()->user()) {
+            $athlete = Athlete::where('email', $user->email)->first();
+            $weightKg = $athlete?->weight;
+        }
+
         $intensity = $this->normalizeIntensity((string) $request->input('intensity', ''));
         $hydrationSetting = $this->findHydrationSettingByIntensity($intensity);
         $baseReminder = (int) ($hydrationSetting?->hydration_reminder ?? 30);
 
-        // Use intensity setting as baseline and tune with environment.
+        // Use intensity setting as baseline and tune with environment and weight.
         $interval = $this->hydrationService->calculateAdjustedInterval(
             $baseReminder,
             $temperature,
             $humidity,
-            $durationMinutes
+            $durationMinutes,
+            $weightKg
         );
 
         // Compute next reminder timestamp.
         $nextReminder = $this->hydrationService->calculateNextReminder(now(), $interval);
 
-        // Return reminder payload for frontend use.
-        return response()->json([
+        $payload = [
             'interval_minutes' => $interval,
             'next_reminder_at' => $nextReminder->toDateTimeString(),
-            'message' => "Based on conditions, drink water every $interval minutes.",
-        ]);
+        ];
+
+        if ($weightKg && $weightKg > 0) {
+            $dailyTargetMl = $this->hydrationService->calculateAdjustedDailyHydrationTarget($weightKg, $temperature, $humidity, $durationMinutes);
+            $drinkMl = $this->hydrationService->calculateReminderVolume($weightKg, $temperature, $humidity, $durationMinutes);
+
+            $payload['daily_target_ml'] = $dailyTargetMl;
+            $payload['drink_size_ml'] = $drinkMl;
+            $payload['message'] = "Drink about {$drinkMl}ml every {$interval} minutes to reach {$dailyTargetMl}ml today!";
+        } else {
+            $payload['message'] = "Based on conditions, drink water every $interval minutes.";
+        }
+
+        return response()->json($payload);
     }
 
     // Starts a training session and stores active session metadata.
@@ -133,18 +153,25 @@ class HydrationReminderController extends Controller
             $totalDuration = 30;
         }
 
+        $weightKg = null;
+        if ($user) {
+            $athlete = Athlete::where('email', $user->email)->first();
+            $weightKg = $athlete?->weight;
+        }
+
         // Fetch hydration settings for the selected intensity
         $hydrationSetting = $this->findHydrationSettingByIntensity($intensity);
         $defaultReminder = $hydrationSetting ? $hydrationSetting->hydration_reminder : 20;
         $breakDuration = $hydrationSetting ? $hydrationSetting->break_duration : 5;
         $breakReminder = $hydrationSetting ? $hydrationSetting->break_reminder : 15;
 
-        // Use intensity setting as baseline and tune with environment.
+        // Use intensity setting as baseline and tune with environment and weight.
         $intervalMinutes = $this->hydrationService->calculateAdjustedInterval(
             (int) $defaultReminder,
             $temperature,
             $humidity,
-            $totalDuration
+            $totalDuration,
+            $weightKg
         );
 
         // Save active session details for later completion.

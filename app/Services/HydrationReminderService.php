@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class HydrationReminderService
 {
-    //Calculate hydration frequency based on environmental stress
+    // Calculate a baseline interval from environment and duration.
     public function calculateInterval($temperature = 25, $humidity = 50, $durationMinutes = 30): int
     {
         $interval = 30;
@@ -22,16 +22,73 @@ class HydrationReminderService
 
         // Intensity/Duration
         if ($durationMinutes >= 90)  $interval -= 5;
-        
+
         return max($interval, 10);
     }
 
-    // Apply environmental stress adjustments on top of a configured base interval.
-    public function calculateAdjustedInterval(int $baseInterval, $temperature = 25, $humidity = 50, $durationMinutes = 30): int
+    // Calculate how much water is needed for a healthy daily target based on body weight.
+    // This uses a broadly accepted medical guideline of about 30-40 ml per kg.
+    public function calculateDailyHydrationTarget(int $weightKg): int
     {
-        $dynamicFromDefault = $this->calculateInterval($temperature, $humidity, $durationMinutes);
-        $deltaFromDefault = $dynamicFromDefault - 30;
+        $targetMl = (int) round($weightKg * 35);
 
+        return max(1500, min($targetMl, 3000));
+    }
+
+    // Calculate a small adjustment to the daily target for heat, humidity, or long activity.
+    public function calculateAdjustedDailyHydrationTarget(int $weightKg, $temperature = 25, $humidity = 50, $durationMinutes = 30): int
+    {
+        $baseTargetMl = $this->calculateDailyHydrationTarget($weightKg);
+        $multiplier = 1.0;
+
+        if ($temperature >= 32) {
+            $multiplier += 0.10;
+        } elseif ($temperature >= 30) {
+            $multiplier += 0.05;
+        }
+
+        if ($humidity >= 80) {
+            $multiplier += 0.10;
+        } elseif ($humidity >= 70) {
+            $multiplier += 0.05;
+        }
+
+        if ($durationMinutes >= 90) {
+            $multiplier += 0.10;
+        } elseif ($durationMinutes >= 60) {
+            $multiplier += 0.05;
+        }
+
+        $adjustedTargetMl = (int) round($baseTargetMl * $multiplier);
+
+        return max(1500, min($adjustedTargetMl, 3000));
+    }
+
+    // Estimate a sensible per-reminder drink amount based on daily target.
+    public function calculateReminderVolume(int $weightKg, $temperature = 25, $humidity = 50, $durationMinutes = 30): int
+    {
+        $targetMl = $this->calculateAdjustedDailyHydrationTarget($weightKg, $temperature, $humidity, $durationMinutes);
+        $suggestedMl = (int) round($targetMl / 18);
+
+        return max(150, min($suggestedMl, 250));
+    }
+
+    // Apply environmental and weight-based adjustments to determine a reminder interval.
+    public function calculateAdjustedInterval(int $baseInterval, $temperature = 25, $humidity = 50, $durationMinutes = 30, ?int $weightKg = null): int
+    {
+        $environmentInterval = $this->calculateInterval($temperature, $humidity, $durationMinutes);
+
+        if ($weightKg && $weightKg > 0) {
+            $dailyTargetMl = $this->calculateAdjustedDailyHydrationTarget($weightKg, $temperature, $humidity, $durationMinutes);
+            $drinkMl = $this->calculateReminderVolume($weightKg, $temperature, $humidity, $durationMinutes);
+            $remindersNeeded = max(1, (int) ceil($dailyTargetMl / $drinkMl));
+            $trackingWindow = max($durationMinutes, 720);
+            $targetInterval = max(10, (int) floor($trackingWindow / $remindersNeeded));
+
+            return min($environmentInterval, $targetInterval);
+        }
+
+        $deltaFromDefault = $environmentInterval - 30;
         return max($baseInterval + $deltaFromDefault, 5);
     }
 
