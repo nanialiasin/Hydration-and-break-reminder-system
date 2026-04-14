@@ -187,6 +187,7 @@ Route::delete('/athletes/remove', [AthleteController::class, 'destroyById'])->na
 
 Route::get('/hydration', [HydrationSettingController::class, 'index'])->name('hydration.index');
 Route::get('/hydration/edit', [HydrationSettingController::class, 'edit'])->name('hydration.edit');
+Route::get('/hydration/preview', [HydrationSettingController::class, 'preview'])->name('hydration.preview');
 Route::post('/hydration/update', [HydrationSettingController::class, 'update'])->name('hydration.update');
 
 Route::get('/coach/home', [CoachController::class, 'index'])->name('coach.home');
