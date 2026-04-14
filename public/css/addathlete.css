@@ -1,16 +1,32 @@
+:root {
+    font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color-scheme: light;
+    --page-bg: #4a4d54;
+    --shell-bg: #e9ecf5;
+    --panel-bg: #ffffff;
+    --panel-soft: #f7f8fb;
+    --text: #0f172a;
+    --muted: #5b6474;
+    --line: #dde2eb;
+    --accent: #0f766e;
+    --accent-strong: #001700;
+    --accent-warm: #f59e0b;
+}
+
 body {
-    background: #4a4d54;
+    background: var(--page-bg);
     display: flex;
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
     margin: 0;
+    font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .container {
     width: 395px;
     padding: 20px;
-    background: #fff;
+    background: var(--panel-bg);
     border-radius: 12px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
     margin-top: 40px;
@@ -19,10 +35,11 @@ body {
 
 h1 {
     text-align: center;
+    color: var(--text);
 }
 
 .card {
-    background: #ffffff;
+    background: var(--panel-bg);
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
