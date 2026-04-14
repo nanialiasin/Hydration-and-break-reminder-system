@@ -1,5 +1,16 @@
 :root {
     font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color-scheme: light;
+    --page-bg: #4a4d54;
+    --shell-bg: #e9ecf5;
+    --panel-bg: #ffffff;
+    --panel-soft: #f7f8fb;
+    --text: #0f172a;
+    --muted: #5b6474;
+    --line: #dde2eb;
+    --accent: #0f766e;
+    --accent-strong: #001700;
+    --accent-warm: #f59e0b;
 }
 
 * {
@@ -11,7 +22,7 @@ body {
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background: #4a4d54;
+    background: radial-gradient(circle at top, #59616f 0%, var(--page-bg) 48%, #3f4249 100%);
     padding: 20px;
 }
 
@@ -19,7 +30,7 @@ body {
     width: min(430px, 100%);
     min-height: min(890px, 96vh);
     border-radius: 0;
-    background: #cfd2db;
+    background: var(--shell-bg);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.18);
     overflow: hidden;
 }
@@ -49,7 +60,7 @@ body {
 
 h1 {
     margin: 0;
-    color: #0f172a;
+    color: var(--text);
     font-size: 44px;
     line-height: 1.08;
     font-weight: 650;
@@ -58,7 +69,7 @@ h1 {
 
 .lead {
     margin: 10px 0 24px;
-    color: #4b5563;
+    color: var(--muted);
     font-size: 17px;
 }
 
@@ -80,8 +91,8 @@ h1 {
     width: 100%;
     border: none;
     border-radius: 11px;
-    background: #f7f7f8;
-    color: #1f2937;
+    background: var(--panel-soft);
+    color: var(--text);
     font-size: 16px;
     padding: 13px 16px;
     margin-bottom: 14px;

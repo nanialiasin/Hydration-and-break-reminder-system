@@ -1,5 +1,16 @@
 :root {
     font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color-scheme: light;
+    --page-bg: #4a4d54;
+    --shell-bg: #e9ecf5;
+    --panel-bg: #ffffff;
+    --panel-soft: #f7f8fb;
+    --text: #0f172a;
+    --muted: #5b6474;
+    --line: #dde2eb;
+    --accent: #0f766e;
+    --accent-strong: #001700;
+    --accent-warm: #f59e0b;
 }
 
 * {
@@ -11,14 +22,14 @@ body {
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background: #4a4d54;
+    background: radial-gradient(circle at top, #59616f 0%, var(--page-bg) 48%, #3f4249 100%);
     padding: 20px;
 }
 
 .app-shell {
     width: min(430px, 100%);
     min-height: min(890px, 96vh);
-    background: #cfd2db;
+    background: var(--shell-bg);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
     overflow: hidden;
     display: flex;
@@ -49,14 +60,14 @@ body {
 
 .greeting {
     margin: 0 0 24px;
-    color: #0f172a;
+    color: var(--text);
     font-size: 32px;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
 
 .stats-card {
-    background: #fff;
+    background: var(--panel-bg);
     border-radius: 16px;
     padding: 20px 24px;
     margin-bottom: 18px;
@@ -70,7 +81,7 @@ body {
     gap: 10px;
     padding-bottom: 10px;
     margin-bottom: 2px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--line);
 }
 
 .sensor-badge {
@@ -87,7 +98,7 @@ body {
 
 .sensor-badge--online {
     background: #dcfce7;
-    color: #166534;
+    color: var(--accent-strong);
 }
 
 .sensor-badge--offline {
@@ -113,19 +124,19 @@ body {
 }
 
 .stat-label {
-    color: #1f2937;
-    font-size: 18px;
-    font-weight: 400;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .stat-value {
-    color: #0f172a;
+    color: var(--text);
     font-size: 28px;
     font-weight: 700;
 }
 
 .ads-card {
-    background: #fff;
+    background: var(--panel-bg);
     border-radius: 16px;
     width: 100%;
     margin: 0 auto 18px;
@@ -145,7 +156,7 @@ body {
 }
 
 .timer-card {
-    background: #fff;
+    background: var(--panel-bg);
     border-radius: 16px;
     padding: 28px 24px 32px;
     text-align: center;
@@ -154,7 +165,7 @@ body {
 
 .timer-title {
     margin: 0 0 24px;
-    color: #0f172a;
+    color: var(--text);
     font-size: 24px;
     font-weight: 700;
 }
@@ -197,14 +208,14 @@ body {
 
 .timer-label {
     margin: 0 0 4px;
-    color: #1f2937;
+    color: var(--muted);
     font-size: 16px;
     font-weight: 500;
 }
 
 .timer-countdown {
     margin: 0;
-    color: #0f172a;
+    color: var(--text);
     font-size: 48px;
     font-weight: 700;
     line-height: 1;
@@ -216,7 +227,7 @@ body {
     border: none;
     border-radius: 10px;
     padding: 12px;
-    background: #001700;
+    background: var(--accent-strong);
     color: #fff;
     font-size: 16px;
     font-weight: 500;
@@ -228,17 +239,17 @@ body {
 }
 
 .daily-stats-card {
-    background: #f8fafc;
+    background: var(--panel-soft);
     border-radius: 16px;
     padding: 20px;
     margin-top: 18px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--line);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .daily-stats-title {
     margin: 0 0 12px;
-    color: #0f172a;
+    color: var(--text);
     font-size: 28px;
     font-weight: 700;
 }
@@ -250,11 +261,11 @@ body {
 }
 
 .daily-stat-box {
-    background: #fff;
+    background: var(--panel-bg);
     border-radius: 12px;
     padding: 14px 10px;
     text-align: center;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--line);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
@@ -268,7 +279,7 @@ body {
 
 .daily-stat-label {
     margin: 8px 0 0;
-    color: #6b7280;
+    color: var(--muted);
     font-size: 15px;
     font-weight: 600;
 }
