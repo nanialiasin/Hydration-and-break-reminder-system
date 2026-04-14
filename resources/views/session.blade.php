@@ -19,15 +19,15 @@
             <div class="stats-card">
                 <div class="stat-row">
                     <span class="stat-label">Temperature</span>
-                    <span class="stat-value">{{ $temp ?? 32 }}°C</span>
+                    <span class="stat-value" id="temperatureValue">{{ $temp ?? 32 }}°C</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Humidity</span>
-                    <span class="stat-value">{{ $humidity ?? 74 }}%</span>
+                    <span class="stat-value" id="humidityValue">{{ $humidity ?? 74 }}%</span>
                 </div>
             </div>
 
-            <div class="sweat-risk">
+            <div class="sweat-risk" id="sweatRiskWarning">
                 <span>HIGH SWEAT RISK</span>
             </div>
 
@@ -67,6 +67,10 @@
         const totalDurationMinutes = {{ $totalDuration ?? 30 }};
         const hydrationAlertUrl = "{{ route('hydration.alert') }}";
         const sessionStateStorageKey = 'hydrationActiveSession';
+        const highRiskTempThreshold = 32;
+        const highRiskHumidityThreshold = 60;
+        const initialTemperature = Number({{ (float) ($temp ?? 32) }});
+        const initialHumidity = Number({{ (float) ($humidity ?? 74) }});
 
         // --- Reminder/timer setup ---
         const intervalSeconds = 10;
@@ -84,12 +88,26 @@
 
         // --- DOM references ---
         const timerElement = document.getElementById('sessionTimer');
+        const sweatRiskWarningElement = document.getElementById('sweatRiskWarning');
 
         const alertsInput = document.getElementById('alertsInput');
         const followedInput = document.getElementById('followedInput');
         const ignoredInput = document.getElementById('ignoredInput');
         const durationSecondsInput = document.getElementById('durationSecondsInput');
         const sessionForm = document.querySelector('.session-actions');
+
+        const updateHighSweatRiskWarning = (temperature, humidity) => {
+            if (!sweatRiskWarningElement) {
+                return;
+            }
+
+            const showHighRisk = Number.isFinite(temperature)
+                && Number.isFinite(humidity)
+                && temperature >= highRiskTempThreshold
+                && humidity >= highRiskHumidityThreshold;
+
+            sweatRiskWarningElement.classList.toggle('is-hidden', !showHighRisk);
+        };
 
         // --- Query params from hydration alert page ---
         const urlParams = new URLSearchParams(window.location.search);
@@ -195,6 +213,7 @@
         };
 
         // --- Initial UI render ---
+        updateHighSweatRiskWarning(initialTemperature, initialHumidity);
         timerElement.textContent = formatTime(remainingSessionSeconds);
         syncStatsToForm();
 
