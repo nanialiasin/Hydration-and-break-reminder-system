@@ -14,6 +14,12 @@
                 <h1 class="page-title">To-Do Session</h1>
             </header>
 
+        <div class="center-btn" style="margin-bottom: 1.5rem;">
+            <a href="{{ route('calculate') }}" class="calculate-sips-btn">
+                How To Calculate Average Sip
+            </a>
+        </div>
+
             <section class="todo-list" aria-label="Training tasks">
                 @forelse(($todoSessions ?? collect()) as $todo)
                     @php
