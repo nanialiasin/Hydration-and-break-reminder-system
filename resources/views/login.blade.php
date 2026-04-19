@@ -17,7 +17,7 @@
         </div>
 
         <h1>Login</h1>
-        <p class="subtitle">Welcome Back Coach!</p>
+        <p class="subtitle">Welcome Back!</p>
         <p class="subtitle">Ready For Training?</p>
 
         <form method="POST" action="{{ route('login') }}">
