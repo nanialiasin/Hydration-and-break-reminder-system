@@ -2,7 +2,11 @@
 <html>
 <head>
     <title>@yield('title', 'Hydrapulse')</title>
+
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+    @yield('styles')
+
     @yield('head')
 </head>
 <body>
