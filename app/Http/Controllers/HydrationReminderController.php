@@ -298,13 +298,17 @@ class HydrationReminderController extends Controller
         // Use baseline conditions for home preview interval.
         $interval = $this->hydrationService->calculateInterval($intervalTemperature, $intervalHumidity, 60);
         // Pull streak and weekly hydration average.
-        [$dayStreak, $weeklyAvgMl] = $this->getDailyStats();
+        [$dayStreak] = $this->getDailyStats();
+        $athlete = \App\Models\Athlete::where('user_id', auth()->id())->first();
+        $weeklyAvg = $athlete?->weekly_avg ?? null;
+
         return view('home', [
             'interval' => $interval,
             'temp' => $temperature,
             'humidity' => $humidity,
             'dayStreak' => $dayStreak,
-            'weeklyAvg' => $weeklyAvgMl,
+            'weeklyAvg' => $weeklyAvg,
+            'athlete' => $athlete,
         ]);
     }
 
@@ -556,9 +560,9 @@ class HydrationReminderController extends Controller
             ->filter(fn (HydrationSession $session) => $session->completed_at && $session->completed_at->greaterThanOrEqualTo($weekStart))
             ->sum(fn (HydrationSession $session) => max(0, (int) $session->followed) * 250);
 
-        $weeklyAvgMl = (int) round($weeklyTotalMl / 7);
+        $weeklyAvg = (int) round($weeklyTotalMl / 7);
 
-        return [$dayStreak, $weeklyAvgMl];
+        return [$dayStreak, $weeklyAvg];
     }
 
     // Helper: get latest live sensor reading or fallback defaults.
