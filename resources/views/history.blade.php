@@ -16,27 +16,29 @@
 
             <div class="activities">
                 @forelse(($sessions ?? collect()) as $session)
-                    <article class="activity-card">
-                        <div class="activity-header">
-                            <div class="activity-name">
-                                <svg class="activity-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M8 12h8M12 8v8"></path>
-                                </svg>
-                                <span>{{ ucfirst($session['sport']) }}</span>
+                    <a href="{{ route('session.completed', ['session_id' => $session['id']]) }}" class="activity-link" aria-label="Open {{ ucfirst($session['sport']) }} session details">
+                        <article class="activity-card">
+                            <div class="activity-header">
+                                <div class="activity-name">
+                                    <svg class="activity-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M8 12h8M12 8v8"></path>
+                                    </svg>
+                                    <span>{{ ucfirst($session['sport']) }}</span>
+                                </div>
+                                <div class="activity-time">
+                                    <p class="date">{{ $session['date'] }}</p>
+                                    <p class="duration">{{ $session['duration'] }}</p>
+                                </div>
                             </div>
-                            <div class="activity-time">
-                                <p class="date">{{ $session['date'] }}</p>
-                                <p class="duration">{{ $session['duration'] }}</p>
+                            <div class="hydration-section">
+                                <span class="hydration-label">Hydration %</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ $session['hydration_score'] }}%;"></div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="hydration-section">
-                            <span class="hydration-label">Hydration %</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: {{ $session['hydration_score'] }}%;"></div>
-                            </div>
-                        </div>
-                    </article>
+                        </article>
+                    </a>
                 @empty
                     <article class="activity-card empty-history">
                         <div class="activity-header">

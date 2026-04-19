@@ -1,5 +1,20 @@
+:root {
+    font-family: 'Poppins', Arial, sans-serif;
+    color-scheme: light;
+    --page-bg: #4a4d54;
+    --shell-bg: #e9ecf5;
+    --panel-bg: #ffffff;
+    --panel-soft: #f7f8fb;
+    --text: #0f172a;
+    --muted: #5b6474;
+    --line: #dde2eb;
+    --accent: #0f766e;
+    --accent-strong: #001700;
+    --accent-warm: #f59e0b;
+}
+
 body {
-    background-color: #4a4d54;
+    background-color: var(--page-bg);
     font-family: 'Poppins', Arial, sans-serif;
 }
 

@@ -426,12 +426,28 @@ class HydrationReminderController extends Controller
         // Start from flash session summary.
         $summary = $request->session()->get('session_summary', []);
 
+        $sessionIdFromQuery = (int) $request->query('session_id', 0);
+        $sessionIdFromSummary = (int) ($summary['session_id'] ?? 0);
+        $targetSessionId = $sessionIdFromQuery > 0 ? $sessionIdFromQuery : $sessionIdFromSummary;
+
         // Prefer persisted DB values when session ID is available.
-        if (!empty($summary['session_id'])) {
-            $storedSession = HydrationSession::find((int) $summary['session_id']);
+        if ($targetSessionId > 0) {
+            $storedSession = HydrationSession::find($targetSessionId);
 
             if ($storedSession) {
+                $viewer = auth()->user();
+
+                // Athletes can only open completed sessions that belong to their athlete profile.
+                if ($viewer && $viewer->role === 'athlete') {
+                    $viewerAthleteId = Athlete::where('email', $viewer->email)->value('athlete_id');
+
+                    if ($viewerAthleteId && $storedSession->athlete_id !== $viewerAthleteId) {
+                        abort(403);
+                    }
+                }
+
                 $summary = [
+                    'session_id' => $storedSession->id,
                     'duration_seconds' => $storedSession->actual_duration_seconds,
                     'alerts' => $storedSession->alerts,
                     'followed' => $storedSession->followed,
@@ -496,6 +512,7 @@ class HydrationReminderController extends Controller
             ->get()
             ->map(function (HydrationSession $session) {
                 return [
+                    'id' => $session->id,
                     'sport' => $session->sport ?: 'General Training',
                     'date' => optional($session->completed_at)->diffForHumans() ?? $session->created_at->diffForHumans(),
                     'duration' => $this->formatDuration($session->actual_duration_seconds),

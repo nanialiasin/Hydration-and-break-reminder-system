@@ -7,7 +7,7 @@ body {
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background: #4a4d54;
+    background: radial-gradient(circle at top, #59616f 0%, #4a4d54 48%, #3f4249 100%);
     padding: 20px;
     font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }

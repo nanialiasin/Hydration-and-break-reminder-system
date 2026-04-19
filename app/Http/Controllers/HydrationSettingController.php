@@ -2,21 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Athlete;
+use App\Models\Coach;
 use App\Models\HydrationSetting;
 use Illuminate\Http\Request;
 
 class HydrationSettingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $settings = HydrationSetting::all();
-        return view('hydration.index', compact('settings'));
+        $context = $this->buildAthleteContext($request);
+
+        return view('hydration.index', array_merge(compact('settings'), $context));
     }
 
-    public function edit()
+    public function edit(Request $request)
     {
         $settings = HydrationSetting::all();
-        return view('hydration.edit', compact('settings'));
+        $context = $this->buildAthleteContext($request);
+
+        return view('hydration.edit', array_merge(compact('settings'), $context));
+    }
+
+    public function preview(Request $request)
+    {
+        $settings = HydrationSetting::all();
+        $context = $this->buildAthleteContext($request);
+
+        return view('hydration.preview', array_merge(compact('settings'), $context));
     }
 
     public function update(Request $request)
@@ -39,5 +53,57 @@ class HydrationSettingController extends Controller
             }
         }
         return redirect()->route('hydration.index')->with('success', 'Hydration settings updated successfully.');
+    }
+
+    private function buildAthleteContext(Request $request): array
+    {
+        $user = auth()->user();
+        $athlete = null;
+        $athletes = collect();
+        $coach = null;
+
+        if ($user?->role === 'athlete') {
+            $athlete = Athlete::where('email', $user->email)->first();
+            $athletes = collect([$athlete])->filter()->values();
+        } elseif ($user?->role === 'coach') {
+            $coach = Coach::where('email', $user->email)->first();
+            $coachKey = $coach?->coach_id;
+            $selectedAthleteId = (string) $request->query('athlete_id', '');
+
+            $athletes = Athlete::query()
+                ->where(function ($query) use ($user, $coachKey) {
+                    $query->where('created_by_coach', (string) $user->id);
+
+                    if (!empty($coachKey)) {
+                        $query->orWhere('created_by_coach', $coachKey);
+                    }
+                })
+                ->orderBy('name')
+                ->get();
+
+            if ($selectedAthleteId !== '') {
+                $athlete = $athletes->firstWhere('athlete_id', $selectedAthleteId)
+                    ?? Athlete::where('athlete_id', $selectedAthleteId)->first();
+            }
+
+            $athlete ??= $athletes->first();
+        }
+
+        $selectedSetting = null;
+        if ($athlete?->intensity) {
+            $selectedSetting = HydrationSetting::query()
+                ->whereRaw('LOWER(intensity) = ?', [strtolower((string) $athlete->intensity)])
+                ->first();
+        }
+
+        $selectedSetting ??= HydrationSetting::query()->first();
+
+        return [
+            'athlete' => $athlete,
+            'athletes' => $athletes,
+            'coach' => $coach,
+            'selectedAthleteId' => $athlete?->athlete_id,
+            'selectedSetting' => $selectedSetting,
+        ];
     }
 }

@@ -5,7 +5,7 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background-color: #4a4d54; 
+    background: radial-gradient(circle at top, #59616f 0%, #4a4d54 48%, #3f4249 100%);
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -45,6 +45,13 @@ h1 {
     margin-bottom: 20px;
 }
 
+:root {
+    --text: #0f172a;
+    --muted: #5b6474;
+    --page-bg: #4a4d54;
+    --shell-bg: #e9ecf5;
+}
+
 .card-title {
     font-weight: 600;
     margin-bottom: 10px;
@@ -55,7 +62,7 @@ h1 {
 .app-shell {
     width: min(430px, 100%);
     min-height: min(890px, 96vh);
-    background: #E9ECF5;
+    background: #e9ecf5;
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
     overflow: hidden;
     display: flex;
