@@ -51,7 +51,7 @@
                         <p class="daily-stat-label">Day Streak</p>
                     </article>
                     <article class="daily-stat-box">
-                        <p class="daily-stat-value">{{ $weeklyAvg ?? 1500 }}ml</p>
+                        <p class="daily-stat-value">{{ isset($weeklyAvg) ? $weeklyAvg . 'ml' : '—' }}</p>
                         <p class="daily-stat-label">Weekly Avg</p>
                     </article>
                 </div>
