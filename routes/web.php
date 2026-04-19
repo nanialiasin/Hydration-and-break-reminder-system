@@ -10,6 +10,7 @@ use App\Http\Controllers\CoachController;
 use App\Http\Controllers\AthleteProfileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CoachProfileController;
+use App\Http\Controllers\HydrationController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -25,31 +26,14 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
         if ($user->role === 'coach') {
-            return redirect()->route('coach.profile');
+            return redirect()->route('coach.home');
         } elseif ($user->role === 'athlete') {
-            // Find athlete profile for this user
             $athlete = \App\Models\Athlete::where('email', $user->email)->first();
-            if ($athlete && $athlete->athlete_id) {
-                return redirect()->route('profile.athlprofile', ['athlete_id' => $athlete->athlete_id]);
+            if ($athlete && !$athlete->sip_prompt_seen) {
+                // Only show the prompt if not seen
+                return redirect()->route('calculate.sips');
             } else {
-                // If athlete profile no longer exists, invalidate this auth account
-                // so the same email must sign up again before using the app.
-                $email = $user->email;
-                $name = $user->name;
-                $userId = $user->id;
-
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-
-                \App\Models\User::where('id', $userId)->delete();
-
-                return redirect()->route('register')
-                    ->withErrors(['email' => 'This athlete account no longer exists. Please sign up again.'])
-                    ->withInput([
-                        'name' => $name,
-                        'email' => $email,
-                    ]);
+                return redirect()->route('home');
             }
         } else {
             return redirect('/home');
@@ -273,3 +257,15 @@ Route::match(['get', 'post'], '/sensor/ingest', [HydrationReminderController::cl
 
 Route::get('/sensor/latest', [HydrationReminderController::class, 'latestSensorReading'])
     ->name('sensor.latest');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('calculate-sips', [HydrationController::class, 'showGuide'])->name('calculate.sips');
+});
+
+Route::post('calculate-sips/finish',
+    [HydrationController::class, 'finishCalculation']
+)->name('calculate.sips.finish');
+
+Route::get('/calculate', function () {
+    return view('hydration.calculate');
+})->name('calculate');
