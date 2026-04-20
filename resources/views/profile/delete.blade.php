@@ -15,7 +15,7 @@
     <div class="modal-overlay">
         <div class="modal-card">
             <div class="warning-icon">⚠️</div>
-            <h2>Are you sure you want to continue?</h2>
+            <h2>Are you sure you want to continue deleting your account?</h2>
             <p>This action cannot be undone.</p>
             <div class="modal-actions">
                 <button class="cancel-btn" onclick="window.location.href='{{ url()->previous() }}'">Cancel</button>
