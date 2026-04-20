@@ -299,7 +299,7 @@ class HydrationReminderController extends Controller
         $interval = $this->hydrationService->calculateInterval($intervalTemperature, $intervalHumidity, 60);
         // Pull streak and weekly hydration average.
         [$dayStreak] = $this->getDailyStats();
-        $athlete = \App\Models\Athlete::where('user_id', auth()->id())->first();
+        $athlete = \App\Models\Athlete::where('email', auth()->user()->email)->first();
         $weeklyAvg = $athlete?->weekly_avg ?? null;
 
         return view('home', [
