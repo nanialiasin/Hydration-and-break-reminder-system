@@ -16,6 +16,7 @@ class CoachDashboardController extends Controller
             return redirect()->route('login')->with('error', 'Please log in to access this page.');
         }
         $coachId = auth()->user()->id;
+        $sessions = HydrationSession::where('coach_id', $coachId)->latest()->get();
         $athletes = Athlete::where('created_by_coach', $coachId)->get();
         $activeAthletes = $athletes->where('status', 'active')->count();
         $inactiveAthletes = $athletes->where('status', 'inactive')->count();
@@ -78,7 +79,8 @@ class CoachDashboardController extends Controller
             'session',
             'averageIntensity',
             'coachHasNotAddedAthletes',
-            'athletes'
+            'athletes',
+            'sessions'
         ));
     }
 
