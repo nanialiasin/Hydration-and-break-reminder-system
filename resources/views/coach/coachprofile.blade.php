@@ -49,7 +49,7 @@
         </section>
 
         <div class="button-group">
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="GET" action="{{ route('profile.logout.confirm') }}">
                 @csrf
                 <button class="btn btn-danger">Log Out</button>
             </form>
