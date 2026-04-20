@@ -14,6 +14,11 @@ class HydrationController extends Controller
         return view('hydration.calculate-sips');
     }
 
+    public function finishSipsGuide(Request $request)
+    {
+        return redirect()->route('home');
+    }
+
     /**
      * After finishing calculation → go to home
      */
