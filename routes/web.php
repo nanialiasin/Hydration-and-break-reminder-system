@@ -277,3 +277,5 @@ Route::post('calculate-sips/finish',
 Route::get('/calculate', function () {
     return view('hydration.calculate');
 })->name('calculate');
+
+Route::post('/athlete/drink', [HydrationReminderController::class, 'logDrink'])->name('athlete.drink');
