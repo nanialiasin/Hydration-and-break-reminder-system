@@ -40,7 +40,10 @@
                     </div>
                 </div>
 
-                <button class="drink-btn">Drink Now</button>
+                <form method="POST" action="{{ route('athlete.drink') }}">
+                    @csrf
+                    <button class="drink-btn" type="submit">Drink Now</button>
+                </form>
             </section>
 
             <section class="daily-stats-card" aria-label="Daily stats">
@@ -51,7 +54,7 @@
                         <p class="daily-stat-label">Day Streak</p>
                     </article>
                     <article class="daily-stat-box">
-                        <p class="daily-stat-value">{{ isset($weeklyAvg) ? $weeklyAvg . 'ml' : '—' }}</p>
+                        <p class="daily-stat-value">{{ $athlete->weekly_total_ml ?? 0 }} ml</p>
                         <p class="daily-stat-label">Weekly Avg</p>
                     </article>
                 </div>

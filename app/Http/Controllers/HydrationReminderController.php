@@ -457,6 +457,12 @@ class HydrationReminderController extends Controller
             }
         }
 
+        $athlete = \App\Models\Athlete::where('email', auth()->user()->email)->first();
+        if ($athlete && $athlete->weekly_avg && isset($summary['followed'])) {
+            $athlete->weekly_total_ml += $athlete->weekly_avg * intval($summary['followed']);
+            $athlete->save();
+        }
+
         // Convert duration into a user-friendly text format.
         $durationSeconds = max(0, (int) ($summary['duration_seconds'] ?? 0));
         $hours = intdiv($durationSeconds, 3600);
@@ -629,4 +635,15 @@ class HydrationReminderController extends Controller
 
         return max(1, $configured);
     }
+
+    public function logDrink(Request $request)
+    {
+        $athlete = \App\Models\Athlete::where('email', auth()->user()->email)->first();
+        if ($athlete && $athlete->weekly_avg) {
+            $athlete->weekly_total_ml += $athlete->weekly_avg;
+            $athlete->save();
+        }
+        return redirect()->back()->with('success', 'Drink logged!');
+    }
+
 }
