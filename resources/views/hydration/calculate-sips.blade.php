@@ -50,16 +50,6 @@
                         ___ kg ( Result A )
                     </p>
 
-                    <!-- <input
-                        type="number"
-                        step="0.001"
-                        name="empty_weight"
-                        class="w-full border-b-2
-                               border-gray-400
-                               bg-transparent
-                               focus:outline-none
-                               mt-2"> -->
-
                 </div>
 
                 <div class="step-divider"></div>
@@ -96,16 +86,6 @@
                         Filled bottle weight =
                         ___ kg ( Result B )
                     </p>
-
-                    <!-- <input
-                        type="number"
-                        step="0.001"
-                        name="filled_weight"
-                        class="w-full border-b-2
-                               border-gray-400
-                               bg-transparent
-                               focus:outline-none
-                               mt-2"> -->
 
                 </div>
 
@@ -192,6 +172,9 @@
 
                     <p class="mt-3 text-gray-700">
                         Convert to mL:
+                    </p>
+
+                    <p class="mt-3 text-gray-700">
                         Water consumed (kg) ( Result E ) x 1000 = Total water consumed (mL) ( Result F )
                     </p>
 
@@ -211,7 +194,7 @@
                     </p>
 
                     <p class="mt-3 text-gray-700">
-                        Average mL per sip ( Final Result ) = Total water consumed (mL) ( Result F ) ÷ Number of sips
+                        Total water consumed (mL) ( Result F ) ÷ Number of sips = Average mL per sip ( Final Result )
                     </p>
 
                 </div>
@@ -230,7 +213,7 @@
 
         <!-- Bottom Continue Button -->
         <div class="bottom-center-btn">
-            <form method="POST" action="{{ route('calculate.sips.finish') }}">
+            <form method="POST" action="{{ route('calculate.sips.done') }}">
                 @csrf
                 <button type="submit" class="bg-black text-white px-8 py-3 rounded-xl shadow-md hover:bg-gray-800 transition">
                     Continue
