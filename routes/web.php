@@ -181,11 +181,6 @@ Route::get('/coach/sessions/in-progress', [CoachController::class, 'inProgressSe
 
 Route::get('/athlprofile/{athlete_id}', [AthleteController::class, 'show'])->name('profile.athlprofile');
 
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/login');
-})->name('logout');
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile/create', [AthleteProfileController::class, 'create'])->name('profile.create');
     Route::post('/profile/store', [AthleteProfileController::class, 'store'])->name('profile.store');
@@ -253,6 +248,16 @@ Route::get('/profile/delete/confirm', function () {
     return view('profile.delete');
 })->name('profile.delete.confirm');
 
+Route::get('/profile/logout/confirm', function () {
+    return view('profile.logout');
+})->name('profile.logout.confirm');
+
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login');
+})->name('logout');
+
+
 Route::match(['get', 'post'], '/sensor/ingest', [HydrationReminderController::class, 'ingestSensorReading'])
     ->name('sensor.ingest');
 
@@ -262,6 +267,8 @@ Route::get('/sensor/latest', [HydrationReminderController::class, 'latestSensorR
 Route::middleware(['auth'])->group(function () {
     Route::get('calculate-sips', [HydrationController::class, 'showGuide'])->name('calculate.sips');
 });
+
+Route::post('/calculate-sips/done', [HydrationController::class, 'finishSipsGuide'])->name('calculate.sips.done');
 
 Route::post('calculate-sips/finish',
     [HydrationController::class, 'finishCalculation']
