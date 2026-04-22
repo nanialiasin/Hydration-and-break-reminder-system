@@ -12,6 +12,7 @@ use App\Models\HydrationSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class HydrationReminderController extends Controller
 {
@@ -300,7 +301,41 @@ class HydrationReminderController extends Controller
         // Pull streak and weekly hydration average.
         [$dayStreak] = $this->getDailyStats();
         $athlete = \App\Models\Athlete::where('email', auth()->user()->email)->first();
+        if ($athlete) {
+            $this->syncDailyHydrationTotal($athlete);
+        }
         $weeklyAvg = $athlete?->weekly_avg ?? null;
+        $weightKg = ($athlete && is_numeric($athlete->weight)) ? (float) $athlete->weight : null;
+
+        $weightClass = $this->hydrationService->getWeightClass($weightKg);
+        $dailyTargetMl = $weightKg
+            ? $this->hydrationService->calculateAdjustedDailyHydrationTarget((int) round($weightKg), $intervalTemperature, $intervalHumidity, 60)
+            : null;
+        $weeklyTargetMl = $dailyTargetMl ? ($dailyTargetMl * 7) : null;
+        $weeklyProgressPercent = ($weeklyTargetMl && ($athlete?->weekly_total_ml ?? 0) > 0)
+            ? min(100, (int) round((($athlete->weekly_total_ml ?? 0) / $weeklyTargetMl) * 100))
+            : 0;
+
+        $dailyMinMl = null;
+        $dailyMaxMl = null;
+        $dailyStatus = null;
+        $dailyWarning = null;
+        if ($weightKg) {
+            $dailyRange = $this->hydrationService->calculateDailyHydrationRange((int) round($weightKg), $intervalTemperature, $intervalHumidity, 60);
+            $dailyMinMl = $dailyRange['min'];
+            $dailyMaxMl = $dailyRange['max'];
+            $todayMl = (float) ($athlete?->daily_total_ml ?? 0);
+
+            if ($todayMl > $dailyMaxMl) {
+                $dailyStatus = 'above-max';
+                $dailyWarning = 'Warning: You exceeded today\'s max intake.';
+            } elseif ($todayMl < $dailyMinMl) {
+                $dailyStatus = 'below-min';
+                $dailyWarning = 'Warning: You are below today\'s minimum intake.';
+            } else {
+                $dailyStatus = 'on-track';
+            }
+        }
 
         return view('home', [
             'interval' => $interval,
@@ -309,6 +344,14 @@ class HydrationReminderController extends Controller
             'dayStreak' => $dayStreak,
             'weeklyAvg' => $weeklyAvg,
             'athlete' => $athlete,
+            'weightClass' => $weightClass,
+            'dailyTargetMl' => $dailyTargetMl,
+            'weeklyTargetMl' => $weeklyTargetMl,
+            'weeklyProgressPercent' => $weeklyProgressPercent,
+            'dailyMinMl' => $dailyMinMl,
+            'dailyMaxMl' => $dailyMaxMl,
+            'dailyStatus' => $dailyStatus,
+            'dailyWarning' => $dailyWarning,
         ]);
     }
 
@@ -458,8 +501,13 @@ class HydrationReminderController extends Controller
         }
 
         $athlete = \App\Models\Athlete::where('email', auth()->user()->email)->first();
+        if ($athlete) {
+            $this->syncDailyHydrationTotal($athlete);
+        }
         if ($athlete && $athlete->weekly_avg && isset($summary['followed'])) {
-            $athlete->weekly_total_ml += $athlete->weekly_avg * intval($summary['followed']);
+            $incrementMl = $athlete->weekly_avg * intval($summary['followed']);
+            $athlete->weekly_total_ml += $incrementMl;
+            $athlete->daily_total_ml += $incrementMl;
             $athlete->save();
         }
 
@@ -639,11 +687,34 @@ class HydrationReminderController extends Controller
     public function logDrink(Request $request)
     {
         $athlete = \App\Models\Athlete::where('email', auth()->user()->email)->first();
-        if ($athlete && $athlete->weekly_avg) {
-            $athlete->weekly_total_ml += $athlete->weekly_avg;
+        if ($athlete) {
+            $this->syncDailyHydrationTotal($athlete);
+            $weightKg = is_numeric($athlete->weight) ? (float) $athlete->weight : null;
+
+            // Prefer user-calibrated sip size. Fallback to class-adjusted reminder volume.
+            $drinkMl = $athlete->weekly_avg;
+            if (!$drinkMl && $weightKg) {
+                $drinkMl = $this->hydrationService->calculateReminderVolume((int) round($weightKg), 32, 74, 60);
+            }
+
+            if ($drinkMl) {
+                $athlete->weekly_total_ml += (float) $drinkMl;
+                $athlete->daily_total_ml += (float) $drinkMl;
+            }
             $athlete->save();
         }
         return redirect()->back()->with('success', 'Drink logged!');
+    }
+
+    private function syncDailyHydrationTotal(Athlete $athlete): void
+    {
+        $today = Carbon::today()->toDateString();
+
+        if ((string) ($athlete->daily_total_date ?? '') !== $today) {
+            $athlete->daily_total_ml = 0;
+            $athlete->daily_total_date = $today;
+            $athlete->save();
+        }
     }
 
 }
