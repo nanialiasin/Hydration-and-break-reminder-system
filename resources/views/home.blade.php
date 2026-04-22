@@ -26,6 +26,12 @@
                 <img src="{{ asset('images/ads.svg') }}" alt="Advertisement" class="ads-image">
             </section>
 
+            @if(!empty($dailyWarning))
+                <div class="hydration-warning {{ $dailyStatus === 'above-max' ? 'warning-high' : 'warning-low' }}" role="alert">
+                    {{ $dailyWarning }}
+                </div>
+            @endif
+
             <section class="timer-card">
                 <h2 class="timer-title">Keep your streak!</h2>
                 
@@ -55,7 +61,11 @@
                     </article>
                     <article class="daily-stat-box">
                         <p class="daily-stat-value">{{ $athlete->weekly_total_ml ?? 0 }} ml</p>
-                        <p class="daily-stat-label">Weekly Avg</p>
+                        <p class="daily-stat-label">This Week</p>
+                    </article>
+                    <article class="daily-stat-box">
+                        <p class="daily-stat-value">{{ (int) ($athlete->daily_total_ml ?? 0) }} ml</p>
+                        <p class="daily-stat-label">Today</p>
                     </article>
                 </div>
             </section>
