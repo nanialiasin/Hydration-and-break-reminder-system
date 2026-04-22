@@ -1,0 +1,12 @@
+[build]
+nixpacks.php = "8.4"
+nixpacks.pkgManager = "composer"
+nixpacks.nodejs = "20"
+
+[build.variables]
+NIXPACKS_PHP_EXTENSIONS = "sqlite pdo_sqlite"
+COMPOSER_NO_DEV = "1"
+COMPOSER_ALLOW_SUPERUSER = "1"
+
+[start]
+cmd = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
