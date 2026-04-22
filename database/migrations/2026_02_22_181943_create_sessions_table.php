@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('beginner_duration')->nullable();
             $table->integer('intermediate_duration')->nullable();
             $table->integer('advanced_duration')->nullable();
+            $table->foreignId('coach_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }
