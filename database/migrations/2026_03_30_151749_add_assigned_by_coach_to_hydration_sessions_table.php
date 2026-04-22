@@ -8,15 +8,19 @@ class AddAssignedByCoachToHydrationSessionsTable extends Migration
 {
     public function up()
     {
-        Schema::table('hydration_sessions', function (Blueprint $table) {
-            $table->boolean('assigned_by_coach')->default(false)->after('coach_id');
-        });
+        if (!Schema::hasColumn('hydration_sessions', 'assigned_by_coach')) {
+            Schema::table('hydration_sessions', function (Blueprint $table) {
+                $table->boolean('assigned_by_coach')->default(false)->after('coach_id');
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('hydration_sessions', function (Blueprint $table) {
-            $table->dropColumn('assigned_by_coach');
-        });
+        if (Schema::hasColumn('hydration_sessions', 'assigned_by_coach')) {
+            Schema::table('hydration_sessions', function (Blueprint $table) {
+                $table->dropColumn('assigned_by_coach');
+            });
+        }
     }
 }
