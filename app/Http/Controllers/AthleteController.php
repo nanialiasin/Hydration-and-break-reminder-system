@@ -7,6 +7,7 @@ use App\Models\Coach;
 use App\Models\HydrationSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AthleteController extends Controller
 {
@@ -151,35 +152,51 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
-        }
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                Log::error('Store method called without authenticated user.');
+                return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
+            }
+            Log::info('User authenticated successfully.', ['user_id' => $user->id]);
 
-        $validated = $request->validate([
-            'name' => 'required',
-            'sport' => 'required',
-            'weight' => 'required|numeric|min:1',
-            'height' => 'required|numeric|min:1',
-            'training_intensity' => 'required',
-        ]);
-        // Use Athlete model's ID generation for consistency
-        $athlete = Athlete::create([
-            'user_id' => $user->id,
-            'athlete_id' => Athlete::generateAthleteId(),
-            'name' => $request->name,
-            'email' => $user->email,
-            'sport' => $request->sport,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
-            'intensity' => $request->training_intensity,
-            'status' => 'active',
-            'created_by_coach' => $request->created_by_coach ?? null,
-        ]);
-        return redirect()->route('profile.athlprofile', [
-            'athlete_id' => $athlete->athlete_id
-        ]);
+            $validated = $request->validate([
+                'name' => 'required',
+                'sport' => 'required',
+                'weight' => 'required|numeric|min:1',
+                'height' => 'required|numeric|min:1',
+                'training_intensity' => 'required',
+            ]);
+            Log::info('Validation passed.', $validated);
+
+            // Use Athlete model's ID generation for consistency
+            $athleteData = [
+                'user_id' => $user->id,
+                'athlete_id' => Athlete::generateAthleteId(),
+                'name' => $request->name,
+                'email' => $user->email,
+                'sport' => $request->sport,
+                'weight' => $request->weight,
+                'height' => $request->height,
+                'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
+                'intensity' => $request->training_intensity,
+                'status' => 'active',
+                'created_by_coach' => $request->created_by_coach ?? null,
+            ];
+            Log::info('Athlete data prepared.', $athleteData);
+
+            $athlete = Athlete::create($athleteData);
+            Log::info('Athlete created successfully.', ['athlete_id' => $athlete->athlete_id]);
+
+            return redirect()->route('profile.athlprofile', [
+                'athlete_id' => $athlete->athlete_id
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in AthleteController@store: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'An internal server error occurred.'], 500);
+        }
     }
     
     public function removePage()
