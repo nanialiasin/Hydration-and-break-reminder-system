@@ -192,9 +192,10 @@ class AthleteController extends Controller
                 'athlete_id' => $athlete->athlete_id
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in AthleteController@store: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
+            // Bypass Laravel's Log facade and write directly to the error stream.
+            error_log('CAUGHT_EXCEPTION: ' . $e->getMessage());
+            error_log($e->getTraceAsString());
+            
             return response()->json(['error' => 'An internal server error occurred.'], 500);
         }
     }
