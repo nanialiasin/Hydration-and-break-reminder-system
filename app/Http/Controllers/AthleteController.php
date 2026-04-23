@@ -152,27 +152,22 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $user = auth()->user();
-            if (!$user) {
-                Log::error('Store method called without authenticated user.');
-                return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
-            }
-            Log::info('User authenticated successfully.', ['user_id' => $user->id]);
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
+        }
 
-            $validated = $request->validate([
-                'name' => 'required',
-                'sport' => 'required',
-                'weight' => 'required|numeric|min:1',
-                'height' => 'required|numeric|min:1',
-                'training_intensity' => 'required',
-            ]);
-            Log::info('Validation passed.', $validated);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'sport' => 'required|string|max:255',
+            'weight' => 'required|numeric|min:1',
+            'height' => 'required|numeric|min:1',
+            'training_intensity' => 'required|string|max:255',
+        ]);
 
-            // Use Athlete model's ID generation for consistency
-            $athleteData = [
-                'user_id' => $user->id,
-                'athlete_id' => Athlete::generateAthleteId(),
+        $athlete = Athlete::updateOrCreate(
+            ['user_id' => $user->id], // Find the athlete by their user_id
+            [
                 'name' => $request->name,
                 'email' => $user->email,
                 'sport' => $request->sport,
@@ -181,23 +176,13 @@ class AthleteController extends Controller
                 'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
                 'intensity' => $request->training_intensity,
                 'status' => 'active',
-                'created_by_coach' => $request->created_by_coach ?? null,
-            ];
-            Log::info('Athlete data prepared.', $athleteData);
+                'athlete_id' => Athlete::where('user_id', $user->id)->value('athlete_id') ?? Athlete::generateAthleteId(),
+            ]
+        );
 
-            $athlete = Athlete::create($athleteData);
-            Log::info('Athlete created successfully.', ['athlete_id' => $athlete->athlete_id]);
-
-            return redirect()->route('profile.athlprofile', [
-                'athlete_id' => $athlete->athlete_id
-            ]);
-        } catch (\Exception $e) {
-            // Bypass Laravel's Log facade and write directly to the error stream.
-            error_log('CAUGHT_EXCEPTION: ' . $e->getMessage());
-            error_log($e->getTraceAsString());
-            
-            return response()->json(['error' => 'An internal server error occurred.'], 500);
-        }
+        return redirect()->route('profile.athlprofile', [
+            'athlete_id' => $athlete->athlete_id
+        ])->with('success', 'Profile saved successfully!');
     }
     
     public function removePage()
