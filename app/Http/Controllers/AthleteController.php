@@ -152,45 +152,36 @@ class AthleteController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $user = auth()->user();
-            if (!$user) {
-                return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
-            }
-
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'sport' => 'required|string|max:255',
-                'weight' => 'required|numeric|min:1',
-                'height' => 'required|numeric|min:1',
-                'training_intensity' => 'required|string|max:255',
-            ]);
-
-            $athlete = Athlete::updateOrCreate(
-                ['user_id' => $user->id], // Find the athlete by their user_id
-                [
-                    'name' => $request->name,
-                    'email' => $user->email,
-                    'sport' => $request->sport,
-                    'weight' => $request->weight,
-                    'height' => $request->height,
-                    'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
-                    'intensity' => $request->training_intensity,
-                    'status' => 'active',
-                    'athlete_id' => Athlete::where('user_id', $user->id)->value('athlete_id') ?? Athlete::generateAthleteId(),
-                ]
-            );
-
-            return redirect()->route('profile.athlprofile', [
-                'athlete_id' => $athlete->athlete_id
-            ])->with('success', 'Profile saved successfully!');
-        } catch (\Exception $e) {
-            // Bypass Laravel's Log facade and write directly to the error stream.
-            error_log('CAUGHT_EXCEPTION: ' . $e->getMessage());
-            error_log($e->getTraceAsString());
-            
-            return response()->json(['error' => 'An internal server error occurred.'], 500);
+        $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
         }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'sport' => 'required|string|max:255',
+            'weight' => 'required|numeric|min:1',
+            'height' => 'required|numeric|min:1',
+            'training_intensity' => 'required|string|max:255',
+        ]);
+
+        $athlete = Athlete::updateOrCreate(
+            ['email' => $user->email], // Find the athlete by their email
+            [
+                'name' => $request->name,
+                'sport' => $request->sport,
+                'weight' => $request->weight,
+                'height' => $request->height,
+                'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
+                'intensity' => $request->training_intensity,
+                'status' => 'active',
+                'athlete_id' => Athlete::where('email', $user->email)->value('athlete_id') ?? Athlete::generateAthleteId(),
+            ]
+        );
+
+        return redirect()->route('profile.athlprofile', [
+            'athlete_id' => $athlete->athlete_id
+        ])->with('success', 'Profile saved successfully!');
     }
     
     public function removePage()
