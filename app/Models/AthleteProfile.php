@@ -15,6 +15,8 @@ class AthleteProfile extends Model
         'height',
         'sport',
         'intensity',
+        'bmi',
+        'hydration_status',
     ];
 
     public function athlete()
