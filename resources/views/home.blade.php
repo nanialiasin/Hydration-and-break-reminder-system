@@ -93,10 +93,18 @@
         </nav>
     </main>
 
+    <div id="hydrationReminderModal" class="hydration-reminder-modal" role="dialog" aria-modal="true" aria-labelledby="hydrationReminderTitle" hidden>
+        <div class="hydration-reminder-card">
+            <h2 id="hydrationReminderTitle" class="hydration-reminder-title">Reminder</h2>
+            <p class="hydration-reminder-message">Time to hydrate!</p>
+            <button id="hydrationReminderAcknowledge" type="button" class="hydration-reminder-btn">Drink Now</button>
+        </div>
+    </div>
+
     <script>
         // --- Timer configuration ---
-        const totalMinutes = {{ $interval ?? 12 }};
-        const defaultIntervalSeconds = Math.max(1, totalMinutes * 60);
+        const totalSeconds = {{ $interval ?? 12 }};
+        const defaultIntervalSeconds = Math.max(1, totalSeconds);
         const athleteTimerStorageKey = "hydration.home.timer." + {{ auth()->id() ?? 0 }};
         let intervalSeconds = defaultIntervalSeconds;
         let endAtMs = Date.now() + (defaultIntervalSeconds * 1000);
@@ -111,6 +119,21 @@
         const humidityValueElement = document.getElementById('humidityValue');
         const sensorLatestUrl = "{{ route('sensor.latest') }}";
         let lastSensorState = null;
+        const hydrationReminderModal = document.getElementById('hydrationReminderModal');
+        const hydrationReminderAcknowledge = document.getElementById('hydrationReminderAcknowledge');
+
+        function showHydrationReminder() {
+            hydrationReminderModal.hidden = false;
+            requestAnimationFrame(() => {
+                hydrationReminderModal.classList.add('is-visible');
+                hydrationReminderAcknowledge.focus();
+            });
+        }
+
+        function hideHydrationReminder() {
+            hydrationReminderModal.classList.remove('is-visible');
+            hydrationReminderModal.hidden = true;
+        }
 
         function loadTimerState() {
             try {
@@ -250,12 +273,16 @@
             if (remainingSeconds <= 0 && !didExpire) {
                 didExpire = true;
                 saveTimerState();
-                alert("Reminder: Time to hydrate!");
+                showHydrationReminder();
             }
         }
 
         // --- Bind actions and start timer loop ---
         drinkButton.addEventListener('click', resetTimer);
+        hydrationReminderAcknowledge.addEventListener('click', () => {
+            resetTimer();
+            hideHydrationReminder();
+        });
 
         initializeTimerState();
         const timerInterval = setInterval(updateTimer, 1000);

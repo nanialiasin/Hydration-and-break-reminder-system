@@ -329,6 +329,62 @@ body {
     border-radius: 999px;
 }
 
+.hydration-reminder-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(12, 14, 20, 0.58);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.hydration-reminder-modal.is-visible {
+    opacity: 1;
+}
+
+.hydration-reminder-card {
+    width: min(360px, 100%);
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 18px 18px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.hydration-reminder-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.hydration-reminder-message {
+    margin: 10px 0 16px;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.hydration-reminder-btn {
+    border: none;
+    border-radius: 10px;
+    background: #0f766e;
+    color: #fff;
+    padding: 10px 16px;
+    min-width: 130px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.hydration-reminder-btn:hover {
+    background: #0b5f59;
+}
+
 .nav-item {
     color: #9ca3af;
     padding: 8px;
