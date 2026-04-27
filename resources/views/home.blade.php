@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('athlete.drink') }}">
+                <form id="drinkNowForm" method="POST" action="{{ route('athlete.drink') }}">
                     @csrf
                     <button class="drink-btn" type="submit">Drink Now</button>
                 </form>
@@ -91,12 +91,30 @@
                 </a>
             @endif
         </nav>
+
+        @if(!empty($dailyWarning) && $dailyStatus === 'above-max')
+            <div id="maxIntakeWarningModal" class="max-intake-warning-modal" role="dialog" aria-modal="true" aria-labelledby="maxIntakeWarningTitle" hidden>
+                <div class="max-intake-warning-card">
+                    <button id="maxIntakeCloseBtn" type="button" class="max-intake-close-btn" aria-label="Close warning">&times;</button>
+                    <h2 id="maxIntakeWarningTitle" class="max-intake-warning-title">Hydration Warning</h2>
+                    <p class="max-intake-warning-message">{{ $dailyWarning }}</p>
+                </div>
+            </div>
+        @endif
     </main>
+
+    <div id="hydrationReminderModal" class="hydration-reminder-modal" role="dialog" aria-modal="true" aria-labelledby="hydrationReminderTitle" hidden>
+        <div class="hydration-reminder-card">
+            <h2 id="hydrationReminderTitle" class="hydration-reminder-title">Reminder</h2>
+            <p class="hydration-reminder-message">Time to hydrate!</p>
+            <button id="hydrationReminderAcknowledge" type="button" class="hydration-reminder-btn">Drink Now</button>
+        </div>
+    </div>
 
     <script>
         // --- Timer configuration ---
-        const totalMinutes = {{ $interval ?? 12 }};
-        const defaultIntervalSeconds = Math.max(1, totalMinutes * 60);
+        const totalSeconds = {{ $interval ?? 12 }};
+        const defaultIntervalSeconds = Math.max(1, totalSeconds);
         const athleteTimerStorageKey = "hydration.home.timer." + {{ auth()->id() ?? 0 }};
         let intervalSeconds = defaultIntervalSeconds;
         let endAtMs = Date.now() + (defaultIntervalSeconds * 1000);
@@ -111,6 +129,48 @@
         const humidityValueElement = document.getElementById('humidityValue');
         const sensorLatestUrl = "{{ route('sensor.latest') }}";
         let lastSensorState = null;
+        const hydrationReminderModal = document.getElementById('hydrationReminderModal');
+        const hydrationReminderAcknowledge = document.getElementById('hydrationReminderAcknowledge');
+        const drinkNowForm = document.getElementById('drinkNowForm');
+        const maxIntakeWarningModal = document.getElementById('maxIntakeWarningModal');
+        const maxIntakeCloseBtn = document.getElementById('maxIntakeCloseBtn');
+
+        function showHydrationReminder() {
+            hydrationReminderModal.hidden = false;
+            requestAnimationFrame(() => {
+                hydrationReminderModal.classList.add('is-visible');
+                hydrationReminderAcknowledge.focus();
+            });
+        }
+
+        function hideHydrationReminder() {
+            hydrationReminderModal.classList.remove('is-visible');
+            hydrationReminderModal.hidden = true;
+        }
+
+        function showMaxIntakeWarning() {
+            if (!maxIntakeWarningModal || !maxIntakeCloseBtn) {
+                return;
+            }
+
+            maxIntakeWarningModal.hidden = false;
+            document.body.classList.add('modal-locked');
+
+            requestAnimationFrame(() => {
+                maxIntakeWarningModal.classList.add('is-visible');
+                maxIntakeCloseBtn.focus();
+            });
+        }
+
+        function hideMaxIntakeWarning() {
+            if (!maxIntakeWarningModal) {
+                return;
+            }
+
+            maxIntakeWarningModal.classList.remove('is-visible');
+            maxIntakeWarningModal.hidden = true;
+            document.body.classList.remove('modal-locked');
+        }
 
         function loadTimerState() {
             try {
@@ -250,12 +310,26 @@
             if (remainingSeconds <= 0 && !didExpire) {
                 didExpire = true;
                 saveTimerState();
-                alert("Reminder: Time to hydrate!");
+                showHydrationReminder();
             }
         }
 
         // --- Bind actions and start timer loop ---
         drinkButton.addEventListener('click', resetTimer);
+        hydrationReminderAcknowledge.addEventListener('click', () => {
+            resetTimer();
+            hideHydrationReminder();
+
+            if (drinkNowForm) {
+                drinkNowForm.requestSubmit();
+            }
+        });
+
+        if (maxIntakeCloseBtn) {
+            maxIntakeCloseBtn.addEventListener('click', hideMaxIntakeWarning);
+        }
+
+        showMaxIntakeWarning();
 
         initializeTimerState();
         const timerInterval = setInterval(updateTimer, 1000);

@@ -26,6 +26,10 @@ body {
     padding: 20px;
 }
 
+body.modal-locked {
+    overflow: hidden;
+}
+
 .app-shell {
     width: min(430px, 100%);
     min-height: min(890px, 96vh);
@@ -327,6 +331,133 @@ body {
     height: 4px;
     background: #fff;
     border-radius: 999px;
+}
+
+.hydration-reminder-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(12, 14, 20, 0.58);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.hydration-reminder-modal.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hydration-reminder-modal[hidden],
+.max-intake-warning-modal[hidden] {
+    display: none;
+}
+
+.hydration-reminder-card {
+    width: min(360px, 100%);
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 18px 18px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.hydration-reminder-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.hydration-reminder-message {
+    margin: 10px 0 16px;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.hydration-reminder-btn {
+    width: 180px;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    background: var(--accent-strong);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.hydration-reminder-btn:hover {
+    background: #0a2a0a;
+}
+
+.max-intake-warning-modal {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(12, 14, 20, 0.72);
+    z-index: 2500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.max-intake-warning-modal.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.max-intake-warning-card {
+    width: min(360px, calc(100% - 12px));
+    background: #fff6f6;
+    border: 2px solid #fca5a5;
+    border-radius: 16px;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+    padding: 22px 18px 18px;
+    position: relative;
+}
+
+.max-intake-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #ef4444;
+    background: #fff;
+    color: #b91c1c;
+    border-radius: 999px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.max-intake-close-btn:hover {
+    background: #fee2e2;
+}
+
+.max-intake-warning-title {
+    margin: 0 0 10px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #7f1d1d;
+    letter-spacing: -0.01em;
+}
+
+.max-intake-warning-message {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.45;
+    font-weight: 600;
+    color: #991b1b;
 }
 
 .nav-item {

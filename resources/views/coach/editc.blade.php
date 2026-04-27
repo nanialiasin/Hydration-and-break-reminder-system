@@ -14,7 +14,7 @@
 
         <section class="card profile-card">
             <div class="coach-avatar">
-                <img src="{{ $coach?->profile_pic && $coach?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $coach->profile_pic) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
+                <img src="{{ $coach?->profile_pic && $coach?->profile_pic !== 'default.jpg' ? route('profile.image', ['filename' => $coach->profile_pic]) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
                 <div class="pic-upload-section">
                     <form id="profile-pic-form" method="POST" action="{{ route('coach.updatePic', $coach->id) }}" enctype="multipart/form-data">
                         @csrf

@@ -22,7 +22,10 @@
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
-            <input class="field" id="email" type="email" name="email" placeholder="Email" autocomplete="email">
+            @error('email')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+            <input class="field" id="email" type="email" name="email" placeholder="Email" autocomplete="email" value="{{ old('email') }}">
             <input class="field" id="password" type="password" name="password" placeholder="Password" autocomplete="current-password">
 
             <a class="forgot" href="{{ route('password.request') }}">Forgot Password?</a>

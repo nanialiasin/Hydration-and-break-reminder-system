@@ -12,10 +12,30 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CoachProfileController;
 use App\Http\Controllers\HydrationController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+Route::get('/profile-pics/{filename}', function (string $filename) {
+    $profilePictureDisk = config('filesystems.profile_pictures_disk', 'public');
+    $profilePicturePath = trim(config('filesystems.profile_pictures_path', 'profile_pics'), '/');
+    $safeFilename = basename($filename);
+    $path = $profilePicturePath . '/' . $safeFilename;
+
+    if (!Storage::disk($profilePictureDisk)->exists($path)) {
+        $defaultPath = public_path('images/default.jpg');
+
+        if (is_file($defaultPath)) {
+            return response()->file($defaultPath);
+        }
+
+        abort(404);
+    }
+
+    return Storage::disk($profilePictureDisk)->response($path);
+})->where('filename', '[A-Za-z0-9._-]+')->name('profile.image');
 
 Route::get('/login', function () {
     return view('login');
@@ -23,6 +43,15 @@ Route::get('/login', function () {
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
     $credentials = $request->only('email', 'password');
+
+    // First, check if the user exists
+    $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+    if (!$user) {
+        return back()->withErrors(['email' => 'User does not exist.'])->withInput($request->only('email'));
+    }
+
+    // Now, attempt to authenticate with the password
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
         if ($user->role === 'coach') {
@@ -39,7 +68,9 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
             return redirect('/home');
         }
     }
-    return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+
+    // If authentication fails, it's because of a wrong password
+    return back()->withErrors(['email' => 'Invalid credentials.'])->withInput($request->only('email'));
 });
 
 Route::get('/streak', [HydrationReminderController::class, 'showStreak'])

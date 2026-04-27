@@ -15,7 +15,7 @@
         <section class="card profile-card">
             <div class="coach-avatar">
                 <img src="{{ $coach->profile_pic && $coach->profile_pic !== 'default.jpg'
-                    ? asset('storage/profile_pics/' . $coach->profile_pic)
+                    ? route('profile.image', ['filename' => $coach->profile_pic])
                     : asset('images/default.jpg') }}"
                     alt="Profile Picture" width="120" height="120">
             </div>

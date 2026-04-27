@@ -15,7 +15,7 @@
         <div class="profile-card">
 
             <div class="profile-avatar mb-2" style="margin-bottom: 18px;">
-                <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $athlete->profile_pic) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
+                <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? route('profile.image', ['filename' => $athlete->profile_pic]) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
             </div>
 
             <div class="athlete-id">

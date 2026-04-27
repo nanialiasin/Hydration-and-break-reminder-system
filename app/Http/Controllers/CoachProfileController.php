@@ -88,11 +88,12 @@ class CoachProfileController extends Controller
         $coach = Coach::findOrFail($id);
 
         if ($request->hasFile('profile_pic')) {
+            $profilePictureDisk = config('filesystems.profile_pictures_disk', 'public');
+            $profilePicturePath = trim(config('filesystems.profile_pictures_path', 'profile_pics'), '/');
             $file = $request->file('profile_pic');
             $filename = uniqid('coach_') . '.' . $file->getClientOriginalExtension();
 
-            // Use the Storage facade with disk 'public'
-            $stored = \Storage::disk('public')->putFileAs('profile_pics', $file, $filename);
+            $stored = \Storage::disk($profilePictureDisk)->putFileAs($profilePicturePath, $file, $filename);
 
             if (!$stored) {
                 return back()->with('error', 'Failed to save profile picture.');
@@ -100,7 +101,7 @@ class CoachProfileController extends Controller
 
             // Delete old profile pic if not default
             if ($coach->profile_pic && $coach->profile_pic !== 'default.jpg') {
-                \Storage::disk('public')->delete('profile_pics/' . $coach->profile_pic);
+                \Storage::disk($profilePictureDisk)->delete($profilePicturePath . '/' . $coach->profile_pic);
             }
 
             $coach->profile_pic = $filename;

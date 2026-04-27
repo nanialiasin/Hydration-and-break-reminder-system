@@ -25,7 +25,7 @@
 
         <section class="card profile-card">
             <div class="athlete-avatar">
-                <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $athlete->profile_pic) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
+                <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? route('profile.image', ['filename' => $athlete->profile_pic]) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
             </div>
             <div class="athlete-id-wrap">
                 <h2 class="athlete-id">Athlete ID: {{ $athlete?->athlete_id ?? 'N/A' }}</h2>
