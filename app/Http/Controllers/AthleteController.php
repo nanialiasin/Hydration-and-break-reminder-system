@@ -7,6 +7,7 @@ use App\Models\Coach;
 use App\Models\HydrationSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AthleteController extends Controller
 {
@@ -156,30 +157,31 @@ class AthleteController extends Controller
             return redirect()->route('login')->with('error', 'You must be logged in to create an athlete profile.');
         }
 
-        $validated = $request->validate([
-            'name' => 'required',
-            'sport' => 'required',
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'sport' => 'required|string|max:255',
             'weight' => 'required|numeric|min:1',
             'height' => 'required|numeric|min:1',
-            'training_intensity' => 'required',
+            'training_intensity' => 'required|string|max:255',
         ]);
-        // Use Athlete model's ID generation for consistency
-        $athlete = Athlete::create([
-            'user_id' => $user->id,
-            'athlete_id' => Athlete::generateAthleteId(),
-            'name' => $request->name,
-            'email' => $user->email,
-            'sport' => $request->sport,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
-            'intensity' => $request->training_intensity,
-            'status' => 'active',
-            'created_by_coach' => $request->created_by_coach ?? null,
-        ]);
+
+        $athlete = Athlete::updateOrCreate(
+            ['email' => $user->email], // Find the athlete by their email
+            [
+                'name' => $request->name,
+                'sport' => $request->sport,
+                'weight' => $request->weight,
+                'height' => $request->height,
+                'bmi' => round($request->weight / pow($request->height / 100, 2), 2),
+                'intensity' => $request->training_intensity,
+                'status' => 'active',
+                'athlete_id' => Athlete::where('email', $user->email)->value('athlete_id') ?? Athlete::generateAthleteId(),
+            ]
+        );
+
         return redirect()->route('profile.athlprofile', [
             'athlete_id' => $athlete->athlete_id
-        ]);
+        ])->with('success', 'Profile saved successfully!');
     }
     
     public function removePage()

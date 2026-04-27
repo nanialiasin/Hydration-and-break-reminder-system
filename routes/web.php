@@ -108,10 +108,9 @@ Route::post('/register', function (\Illuminate\Http\Request $request) {
     }
 });
 
-Route::get('/home', function () {
-    $athlete = \App\Models\Athlete::where('email', Auth::user()->email)->first();
-    return view('home', compact('athlete'));
-})->name('home');
+Route::get('/home', [HydrationReminderController::class, 'showHome'])
+    ->middleware('auth')
+    ->name('home');
 
 Route::get('/training', function () {
     $athlete = \App\Models\Athlete::where('email', Auth::user()->email)->first();

@@ -20,6 +20,9 @@ class Athlete extends Model
         'created_by_coach',
         'alert_volume',
         'reminder_volume',
+        'weekly_total_ml',
+        'daily_total_ml',
+        'daily_total_date',
         'stay_logged_in',
     ];
 

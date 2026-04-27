@@ -6,6 +6,10 @@ use Carbon\Carbon;
 
 class HydrationReminderService
 {
+    public const WEIGHT_CLASS_LIGHT = 'Lightweight';
+    public const WEIGHT_CLASS_MIDDLE = 'Middleweight';
+    public const WEIGHT_CLASS_HEAVY = 'Heavyweight';
+
     // Calculate a baseline interval from environment and duration.
     public function calculateInterval($temperature = 25, $humidity = 50, $durationMinutes = 30): int
     {
@@ -59,9 +63,38 @@ class HydrationReminderService
             $multiplier += 0.05;
         }
 
+        // Weight class adjustment keeps targets distinct across athlete classes.
+        $multiplier *= $this->getWeightClassHydrationFactor($weightKg);
+
         $adjustedTargetMl = (int) round($baseTargetMl * $multiplier);
 
         return max(1500, min($adjustedTargetMl, 3000));
+    }
+
+    public function getWeightClass(?float $weightKg): ?string
+    {
+        if (!$weightKg || $weightKg <= 0) {
+            return null;
+        }
+
+        if ($weightKg < 60) {
+            return self::WEIGHT_CLASS_LIGHT;
+        }
+
+        if ($weightKg < 80) {
+            return self::WEIGHT_CLASS_MIDDLE;
+        }
+
+        return self::WEIGHT_CLASS_HEAVY;
+    }
+
+    public function getWeightClassHydrationFactor(?float $weightKg): float
+    {
+        return match ($this->getWeightClass($weightKg)) {
+            self::WEIGHT_CLASS_LIGHT => 0.95,
+            self::WEIGHT_CLASS_HEAVY => 1.08,
+            default => 1.00,
+        };
     }
 
     // Estimate a sensible per-reminder drink amount based on daily target.
@@ -71,6 +104,20 @@ class HydrationReminderService
         $suggestedMl = (int) round($targetMl / 18);
 
         return max(150, min($suggestedMl, 250));
+    }
+
+    // Return a practical daily range around the adjusted target.
+    public function calculateDailyHydrationRange(int $weightKg, $temperature = 25, $humidity = 50, $durationMinutes = 30): array
+    {
+        $targetMl = $this->calculateAdjustedDailyHydrationTarget($weightKg, $temperature, $humidity, $durationMinutes);
+        $minMl = (int) round($targetMl * 0.85);
+        $maxMl = (int) round($targetMl * 1.15);
+
+        return [
+            'target' => $targetMl,
+            'min' => max(1200, $minMl),
+            'max' => max($minMl, $maxMl),
+        ];
     }
 
     // Apply environmental and weight-based adjustments to determine a reminder interval.
