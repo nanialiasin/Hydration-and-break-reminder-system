@@ -12,6 +12,28 @@
     <div class="content">
         <h1 class="profile-title">Edit Profile</h1>
 
+        @if (session('success'))
+            <div class="alert alert-success" role="alert" style="margin-bottom: 14px; color: #166534; background: #dcfce7; border: 1px solid #86efac; border-radius: 10px; padding: 10px 12px; font-weight: 600;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger" role="alert" style="margin-bottom: 14px; color: #991b1b; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; padding: 10px 12px; font-weight: 600;">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger" role="alert" style="margin-bottom: 14px; color: #991b1b; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 10px; padding: 10px 12px; font-weight: 600;">
+                <ul style="margin: 0; padding-left: 18px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <section class="card profile-card">
             <div class="coach-avatar">
                 <img src="{{ $coach?->profile_pic && $coach?->profile_pic !== 'default.jpg' ? route('profile.image', ['filename' => $coach->profile_pic]) : asset('images/default.jpg') }}" class="rounded-circle" width="100" height="100" id="profilePicView">
@@ -20,7 +42,7 @@
                         @csrf
                         <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" style="display:none;">
                         <button type="button" class="btn-change-pic" onclick="document.getElementById('profilePicInput').click();">Change Profile Picture</button>
-                        <button type="submit" class="btn-save-pic" id="savePicBtn" style="display:none;">Save Picture</button>
+                        <button type="submit" class="btn-save-pic" id="savePicBtn" style="display:none;">Uploading...</button>
                     </form>
                 </div>
             </div>
@@ -90,7 +112,9 @@ document.getElementById('profilePicInput').addEventListener('change', function(e
         };
         reader.readAsDataURL(file);
         document.getElementById('savePicBtn').style.display = 'inline-block';
+        document.getElementById('profile-pic-form').requestSubmit();
     }
+});
 
 document.getElementById('phone_number').addEventListener('input', function (e) {
     this.value = this.value.replace(/[^0-9]/g, '');

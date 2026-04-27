@@ -59,7 +59,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => [
-                \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET SESSION sql_require_primary_key=0',
+                (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_INIT_COMMAND : \PDO::MYSQL_ATTR_INIT_COMMAND) => 'SET SESSION sql_require_primary_key=0',
             ],
         ],
 
