@@ -93,10 +93,21 @@ class CoachProfileController extends Controller
             $file = $request->file('profile_pic');
             $filename = uniqid('coach_') . '.' . $file->getClientOriginalExtension();
 
-            $stored = \Storage::disk($profilePictureDisk)->putFileAs($profilePicturePath, $file, $filename);
+            try {
+                $stored = \Storage::disk($profilePictureDisk)->putFileAs($profilePicturePath, $file, $filename);
+            } catch (\Throwable $e) {
+                \Log::error('Coach profile picture upload failed.', [
+                    'coach_id' => $coach->id,
+                    'disk' => $profilePictureDisk,
+                    'path' => $profilePicturePath,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return back()->with('error', 'Failed to upload profile picture: ' . $e->getMessage());
+            }
 
             if (!$stored) {
-                return back()->with('error', 'Failed to save profile picture.');
+                return back()->with('error', 'Failed to save profile picture on disk: ' . $profilePictureDisk);
             }
 
             // Delete old profile pic if not default

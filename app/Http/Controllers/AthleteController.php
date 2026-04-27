@@ -292,10 +292,21 @@ class AthleteController extends Controller
             $file = $request->file('profile_pic');
             $filename = 'athlete_' . $athlete->athlete_id . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-            $stored = \Storage::disk($profilePictureDisk)->putFileAs($profilePicturePath, $file, $filename);
+            try {
+                $stored = \Storage::disk($profilePictureDisk)->putFileAs($profilePicturePath, $file, $filename);
+            } catch (\Throwable $e) {
+                \Log::error('Athlete profile picture upload failed.', [
+                    'athlete_id' => $athlete->athlete_id,
+                    'disk' => $profilePictureDisk,
+                    'path' => $profilePicturePath,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return redirect()->back()->with('error', 'Failed to upload profile picture: ' . $e->getMessage());
+            }
 
             if (!$stored) {
-                return redirect()->back()->with('error', 'Failed to save profile picture.');
+                return redirect()->back()->with('error', 'Failed to save profile picture on disk: ' . $profilePictureDisk);
             }
 
             // Delete old profile pic if not default
