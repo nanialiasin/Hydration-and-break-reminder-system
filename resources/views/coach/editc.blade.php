@@ -14,7 +14,21 @@
 
         @if (session('success'))
             <div class="alert alert-success" role="alert" style="margin-bottom: 14px; color: #166534; background: #dcfce7; border: 1px solid #86efac; border-radius: 10px; padding: 10px 12px; font-weight: 600;">
-                {{ session('success') }}
+                android {
+                    // ... existing code ...
+                    
+                    buildTypes {
+                        debug {
+                            applicationIdSuffix ".debug"
+                        }
+                    }
+                    
+                    applicationVariants.all { variant ->
+                        variant.outputs.all { output ->
+                            outputFileName = "HydraPulse-${variant.baseName}.apk"
+                        }
+                    }
+                }                {{ session('success') }}
             </div>
         @endif
 
