@@ -46,7 +46,7 @@
 
                 <div class="form-group">
                     <label for="phone_number">Phone Number</label>
-                    <input type="text" id="phone_number" name="phone_number" value="{{ $coach->phone_number }}" required class="form-field">
+                    <input type="tel" id="phone_number" name="phone_number" value="{{ $coach->phone_number }}" required class="form-field" pattern="[0-9]*" inputmode="numeric">
                 </div>
 
                 <div class="form-group">
@@ -91,6 +91,9 @@ document.getElementById('profilePicInput').addEventListener('change', function(e
         reader.readAsDataURL(file);
         document.getElementById('savePicBtn').style.display = 'inline-block';
     }
+
+document.getElementById('phone_number').addEventListener('input', function (e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
 });
 </script>
 </body>
