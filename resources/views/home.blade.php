@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('athlete.drink') }}">
+                <form id="drinkNowForm" method="POST" action="{{ route('athlete.drink') }}">
                     @csrf
                     <button class="drink-btn" type="submit">Drink Now</button>
                 </form>
@@ -91,6 +91,16 @@
                 </a>
             @endif
         </nav>
+
+        @if(!empty($dailyWarning) && $dailyStatus === 'above-max')
+            <div id="maxIntakeWarningModal" class="max-intake-warning-modal" role="dialog" aria-modal="true" aria-labelledby="maxIntakeWarningTitle" hidden>
+                <div class="max-intake-warning-card">
+                    <button id="maxIntakeCloseBtn" type="button" class="max-intake-close-btn" aria-label="Close warning">&times;</button>
+                    <h2 id="maxIntakeWarningTitle" class="max-intake-warning-title">Hydration Warning</h2>
+                    <p class="max-intake-warning-message">{{ $dailyWarning }}</p>
+                </div>
+            </div>
+        @endif
     </main>
 
     <div id="hydrationReminderModal" class="hydration-reminder-modal" role="dialog" aria-modal="true" aria-labelledby="hydrationReminderTitle" hidden>
@@ -121,6 +131,9 @@
         let lastSensorState = null;
         const hydrationReminderModal = document.getElementById('hydrationReminderModal');
         const hydrationReminderAcknowledge = document.getElementById('hydrationReminderAcknowledge');
+        const drinkNowForm = document.getElementById('drinkNowForm');
+        const maxIntakeWarningModal = document.getElementById('maxIntakeWarningModal');
+        const maxIntakeCloseBtn = document.getElementById('maxIntakeCloseBtn');
 
         function showHydrationReminder() {
             hydrationReminderModal.hidden = false;
@@ -133,6 +146,30 @@
         function hideHydrationReminder() {
             hydrationReminderModal.classList.remove('is-visible');
             hydrationReminderModal.hidden = true;
+        }
+
+        function showMaxIntakeWarning() {
+            if (!maxIntakeWarningModal || !maxIntakeCloseBtn) {
+                return;
+            }
+
+            maxIntakeWarningModal.hidden = false;
+            document.body.classList.add('modal-locked');
+
+            requestAnimationFrame(() => {
+                maxIntakeWarningModal.classList.add('is-visible');
+                maxIntakeCloseBtn.focus();
+            });
+        }
+
+        function hideMaxIntakeWarning() {
+            if (!maxIntakeWarningModal) {
+                return;
+            }
+
+            maxIntakeWarningModal.classList.remove('is-visible');
+            maxIntakeWarningModal.hidden = true;
+            document.body.classList.remove('modal-locked');
         }
 
         function loadTimerState() {
@@ -282,7 +319,17 @@
         hydrationReminderAcknowledge.addEventListener('click', () => {
             resetTimer();
             hideHydrationReminder();
+
+            if (drinkNowForm) {
+                drinkNowForm.requestSubmit();
+            }
         });
+
+        if (maxIntakeCloseBtn) {
+            maxIntakeCloseBtn.addEventListener('click', hideMaxIntakeWarning);
+        }
+
+        showMaxIntakeWarning();
 
         initializeTimerState();
         const timerInterval = setInterval(updateTimer, 1000);
