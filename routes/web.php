@@ -23,6 +23,12 @@ Route::get('/profile-pics/{filename}', function (string $filename) {
     $path = 'profile_pics/' . $safeFilename;
 
     if (!Storage::disk('public')->exists($path)) {
+        $defaultPath = public_path('images/default.jpg');
+
+        if (is_file($defaultPath)) {
+            return response()->file($defaultPath);
+        }
+
         abort(404);
     }
 

@@ -342,11 +342,18 @@ body.modal-locked {
     background: rgba(12, 14, 20, 0.58);
     z-index: 1000;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.2s ease;
 }
 
 .hydration-reminder-modal.is-visible {
     opacity: 1;
+    pointer-events: auto;
+}
+
+.hydration-reminder-modal[hidden],
+.max-intake-warning-modal[hidden] {
+    display: none;
 }
 
 .hydration-reminder-card {
