@@ -4,6 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Profile Picture Storage
+    |--------------------------------------------------------------------------
+    |
+    | Profile pictures can be stored on a dedicated disk/path separate from
+    | other files. Set PROFILE_PICTURES_DISK=s3 for DigitalOcean Spaces.
+    |
+    */
+
+    'profile_pictures_disk' => env('PROFILE_PICTURES_DISK', 'public'),
+    'profile_pictures_path' => trim(env('PROFILE_PICTURES_PATH', 'profile_pics'), '/'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
     |

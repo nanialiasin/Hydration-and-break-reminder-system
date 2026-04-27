@@ -287,11 +287,12 @@ class AthleteController extends Controller
         }
 
         if ($request->hasFile('profile_pic')) {
+            $profilePictureDisk = config('filesystems.profile_pictures_disk', 'public');
+            $profilePicturePath = trim(config('filesystems.profile_pictures_path', 'profile_pics'), '/');
             $file = $request->file('profile_pic');
             $filename = 'athlete_' . $athlete->athlete_id . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-            // Save file in storage/app/public/profile_pics
-            $stored = \Storage::disk('public')->putFileAs('profile_pics', $file, $filename);
+            $stored = \Storage::disk($profilePictureDisk)->putFileAs($profilePicturePath, $file, $filename);
 
             if (!$stored) {
                 return redirect()->back()->with('error', 'Failed to save profile picture.');
@@ -299,7 +300,7 @@ class AthleteController extends Controller
 
             // Delete old profile pic if not default
             if ($athlete->profile_pic && $athlete->profile_pic !== 'default.jpg') {
-                \Storage::disk('public')->delete('profile_pics/' . $athlete->profile_pic);
+                \Storage::disk($profilePictureDisk)->delete($profilePicturePath . '/' . $athlete->profile_pic);
             }
 
             $athlete->profile_pic = $filename;

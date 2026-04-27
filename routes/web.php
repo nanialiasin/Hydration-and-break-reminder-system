@@ -19,10 +19,12 @@ Route::get('/', function () {
 });
 
 Route::get('/profile-pics/{filename}', function (string $filename) {
+    $profilePictureDisk = config('filesystems.profile_pictures_disk', 'public');
+    $profilePicturePath = trim(config('filesystems.profile_pictures_path', 'profile_pics'), '/');
     $safeFilename = basename($filename);
-    $path = 'profile_pics/' . $safeFilename;
+    $path = $profilePicturePath . '/' . $safeFilename;
 
-    if (!Storage::disk('public')->exists($path)) {
+    if (!Storage::disk($profilePictureDisk)->exists($path)) {
         $defaultPath = public_path('images/default.jpg');
 
         if (is_file($defaultPath)) {
@@ -32,7 +34,7 @@ Route::get('/profile-pics/{filename}', function (string $filename) {
         abort(404);
     }
 
-    return response()->file(Storage::disk('public')->path($path));
+    return Storage::disk($profilePictureDisk)->response($path);
 })->where('filename', '[A-Za-z0-9._-]+')->name('profile.image');
 
 Route::get('/login', function () {
