@@ -9,12 +9,11 @@
 </style>
 @section('content')
 <div class="container">
-    <!-- Back Button -->
-    <a href="{{ url()->previous() }}" class="back-button">←</a>
-    <!-- Large Center Logo -->
-    <img src="{{ asset('images/hydrapulse-logo.svg') }}" alt="Hydrapulse Logo" style="display:block; margin:0 auto 10px auto; width:260px; height:260px; border-radius:50%;">
+    <img src="{{ asset('images/hydrapulse-logo.svg') }}" alt="Hydrapulse Logo" style="display:block; margin:0 auto 10px auto; width:120px; height:120px; border-radius:50%;">
+
     <div class="profile-card" style="margin-top: 0;">
         <h2>Create Profile</h2>
+        <p class="lead">Complete your athlete details to start.</p>
         @if($errors->any())
             <div class="alert alert-danger" style="margin-bottom:16px;">
                 <ul style="margin:0; padding-left:18px;">
