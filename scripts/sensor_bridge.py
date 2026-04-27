@@ -68,6 +68,8 @@ def send_reading(url: str, temperature: float, humidity: float, key: str | None,
         details = exc.read().decode("utf-8", errors="replace")
         return False, f"HTTP {exc.code}: {details}"
     except urllib.error.URLError as exc:
+        if "getaddrinfo failed" in str(exc):
+            return False, f"Network error: {exc}. Is the app running and the URL correct?"
         return False, f"Network error: {exc}"
 
 
@@ -75,7 +77,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Bridge Arduino serial readings to Laravel sensor ingest endpoint.")
     parser.add_argument("--port", required=True, help="Serial port, e.g. COM4")
     parser.add_argument("--baud", type=int, default=115200, help="Baud rate (default: 115200)")
-    parser.add_argument("--app-url", default="http://127.0.0.1:8000", help="Laravel app base URL")
+    parser.add_argument("--app-url", default="http://hydrapulse.test", help="Laravel app base URL")
     parser.add_argument("--key", default=None, help="Optional HYDRATION_SENSOR_KEY")
     parser.add_argument("--timeout", type=float, default=5.0, help="HTTP timeout seconds")
     parser.add_argument("--dedupe-seconds", type=float, default=1.5, help="Minimum interval between uploads")

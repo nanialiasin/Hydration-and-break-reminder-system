@@ -23,6 +23,15 @@ Route::get('/login', function () {
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
     $credentials = $request->only('email', 'password');
+
+    // First, check if the user exists
+    $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+    if (!$user) {
+        return back()->withErrors(['email' => 'User does not exist.'])->withInput($request->only('email'));
+    }
+
+    // Now, attempt to authenticate with the password
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
         if ($user->role === 'coach') {
@@ -39,7 +48,9 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
             return redirect('/home');
         }
     }
-    return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+
+    // If authentication fails, it's because of a wrong password
+    return back()->withErrors(['email' => 'Invalid credentials.'])->withInput($request->only('email'));
 });
 
 Route::get('/streak', [HydrationReminderController::class, 'showStreak'])
