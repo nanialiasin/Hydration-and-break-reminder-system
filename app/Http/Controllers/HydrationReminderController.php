@@ -228,6 +228,27 @@ class HydrationReminderController extends Controller
             ->first();
     }
 
+    // Reopen active athlete session with persisted values from server session.
+    public function showSession(Request $request)
+    {
+        $activeSession = $request->session()->get('active_session');
+
+        if (!$activeSession) {
+            return redirect()->route('training')->with('error', 'No active session found. Start a session first.');
+        }
+
+        return view('session', [
+            'interval' => (int) ($activeSession['interval_minutes'] ?? 20),
+            'breakDuration' => (int) ($activeSession['break_duration'] ?? 5),
+            'breakReminder' => (int) ($activeSession['break_reminder'] ?? 15),
+            'totalDuration' => (int) ($activeSession['planned_duration_minutes'] ?? 30),
+            'temp' => (float) ($activeSession['temperature'] ?? 0),
+            'humidity' => (float) ($activeSession['humidity'] ?? 0),
+            'sport' => (string) ($activeSession['sport'] ?? 'General Training'),
+            'intensity' => (string) ($activeSession['intensity'] ?? 'beginner'),
+        ]);
+    }
+
     // Endpoint for Arduino/bridge to push latest sensor values.
     public function ingestSensorReading(Request $request): JsonResponse
     {

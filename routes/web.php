@@ -169,9 +169,7 @@ Route::get('/hydration/alert', function () {
     return view('hydration-alert');
 })->name('hydration.alert');
 
-Route::get('/session', function () {
-    return view('session');
-})->name('session.show');
+Route::get('/session', [HydrationReminderController::class, 'showSession'])->name('session.show');
 
 Route::get('/session/completed', [HydrationReminderController::class, 'showSessionCompleted'])
     ->name('session.completed');
