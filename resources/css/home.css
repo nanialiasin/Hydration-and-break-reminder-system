@@ -374,19 +374,19 @@ body.modal-locked {
 }
 
 .hydration-reminder-btn {
+    width: 180px;
     border: none;
     border-radius: 10px;
-    background: #0f766e;
+    padding: 12px;
+    background: var(--accent-strong);
     color: #fff;
-    padding: 10px 16px;
-    min-width: 130px;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
 }
 
 .hydration-reminder-btn:hover {
-    background: #0b5f59;
+    background: #0a2a0a;
 }
 
 .max-intake-warning-modal {
