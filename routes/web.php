@@ -12,10 +12,22 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CoachProfileController;
 use App\Http\Controllers\HydrationController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+Route::get('/profile-pics/{filename}', function (string $filename) {
+    $safeFilename = basename($filename);
+    $path = 'profile_pics/' . $safeFilename;
+
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file(Storage::disk('public')->path($path));
+})->where('filename', '[A-Za-z0-9._-]+')->name('profile.image');
 
 Route::get('/login', function () {
     return view('login');

@@ -23,7 +23,7 @@
             @endif
 
             <div class="athlete-avatar">
-                <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? asset('storage/profile_pics/' . $athlete->profile_pic) : asset('images/default.jpg') }}" class="avatar" width="100" height="100" id="profilePicPreview">
+                <img src="{{ $athlete?->profile_pic && $athlete?->profile_pic !== 'default.jpg' ? route('profile.image', ['filename' => $athlete->profile_pic]) : asset('images/default.jpg') }}" class="avatar" width="100" height="100" id="profilePicPreview">
                 <div class="pic-upload-section">
                     <form id="profile-pic-form" method="POST" action="{{ route('profile.updatePic') }}" enctype="multipart/form-data">
                         @csrf
