@@ -42,7 +42,7 @@
                         @csrf
                         <input type="file" name="profile_pic" id="profilePicInput" accept="image/*" style="display:none;">
                         <button type="button" class="btn-change-pic" onclick="document.getElementById('profilePicInput').click();">Change Profile Picture</button>
-                        <button type="submit" class="btn-save-pic" id="savePicBtn" style="display:none;">Uploading...</button>
+                        <button type="submit" class="btn-save-pic" id="savePicBtn" style="display:none;">Save Picture</button>
                     </form>
                 </div>
             </div>
@@ -112,7 +112,6 @@ document.getElementById('profilePicInput').addEventListener('change', function(e
         };
         reader.readAsDataURL(file);
         document.getElementById('savePicBtn').style.display = 'inline-block';
-        document.getElementById('profile-pic-form').requestSubmit();
     }
 });
 
