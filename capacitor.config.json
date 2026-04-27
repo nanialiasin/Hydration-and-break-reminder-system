@@ -1,0 +1,9 @@
+{
+  "appId": "com.hydrapulse.app",
+  "appName": "HydraPulse",
+  "webDir": "www",
+  "server": {
+    "url": "https://hydrapulse-kbjmv.ondigitalocean.app",
+    "cleartext": false
+  }
+}
