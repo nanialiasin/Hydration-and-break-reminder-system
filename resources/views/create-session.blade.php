@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Session</title>
     @vite('resources/css/create-session.css')
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-shell,
+        .bottom-nav {
+            width: min(430px, 100%);
+        }
+    </style>
 </head>
 <body>
     <div class="app-shell">
