@@ -187,7 +187,7 @@
             persistState();
 
             urlParams.delete('hydration_action');
-            const cleanedUrl = `${window.location.pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ''}`);
+            const cleanedUrl = `${window.location.pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ''}`;
             window.history.replaceState({}, '', cleanedUrl);
         }
 
