@@ -34,7 +34,7 @@ body {
     min-height: min(890px, 96vh);
     background: var(--shell-bg);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
+    overflow: hidden;  /* Prevents scrolling on shell */
     display: flex;
     flex-direction: column;
 }
@@ -53,8 +53,7 @@ body {
 
 .content {
     flex: 1;
-    padding: 20px;
-    overflow-y: auto;
+    overflow-y: auto;  /* Allows only content to scroll */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -225,7 +224,7 @@ body {
 
 /* Scrollbar styling */
 .content::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 .content::-webkit-scrollbar-track {
@@ -233,10 +232,15 @@ body {
 }
 
 .content::-webkit-scrollbar-thumb {
-    background: #999;
-    border-radius: 3px;
+    background: rgba(92, 102, 118, 0.28);
+    border-radius: 999px;
 }
 
 .content::-webkit-scrollbar-thumb:hover {
-    background: #666;
+    background: rgba(92, 102, 118, 0.45);
+}
+
+.content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(92, 102, 118, 0.28) transparent;
 }

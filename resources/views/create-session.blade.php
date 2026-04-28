@@ -7,14 +7,7 @@
     @vite('resources/css/create-session.css')
 </head>
 <body>
-    <div class="phone-shell">
-        <div class="header">
-            <a href="{{ route('coach.creating') }}" class="back-button" aria-label="Go back">
-                <img src="{{ asset('images/arrow-left.svg') }}" alt="Back" width="24" height="24">
-            </a>
-            <h1>Create new session</h1>
-        </div>
-
+    <div class="app-shell">
         <div class="content">
             <form class="session-form" method="POST" action="{{ route('session.store') }}">
                 @csrf
@@ -76,24 +69,24 @@
                 </div>
             </form>
         </div>
-
-        <nav class="bottom-nav" aria-label="Main navigation">
-            <a href="{{ route('coach.home') }}" class="nav-item" aria-label="Home">
-                <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
-            </a>
-            <a href="{{ route('hydration.index') }}" class="nav-item" aria-label="Hydration">
-                <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
-            </a>
-            <a href="{{ route('coach.creating') }}" class="nav-item active" aria-label="Create">
-                <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
-            </a>
-            <a href="{{ route('coach.sessions.progress') }}" class="nav-item" aria-label="History">
-                <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
-            </a>
-            <a href="{{ route('coach.profile') }}" class="nav-item" aria-label="Profile">
-                <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
-            </a>
-        </nav>
     </div>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+        <a href="{{ route('coach.home') }}" class="nav-item" aria-label="Home">
+            <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
+        </a>
+        <a href="{{ route('hydration.index') }}" class="nav-item" aria-label="Hydration">
+            <img src="{{ asset('images/droplet.png') }}" alt="Hydration" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.creating') }}" class="nav-item active" aria-label="Create">
+            <img src="{{ asset('images/Create.svg') }}" alt="Create" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.sessions.progress') }}" class="nav-item" aria-label="History">
+            <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
+        </a>
+        <a href="{{ route('coach.profile') }}" class="nav-item" aria-label="Profile">
+            <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
+        </a>
+    </nav>
 </body>
 </html>

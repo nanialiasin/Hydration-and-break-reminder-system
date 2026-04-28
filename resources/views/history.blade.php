@@ -7,7 +7,7 @@
     @vite('resources/css/history.css')
 </head>
 <body>
-    <main class="app-shell" role="main">
+    <main class="app-shell">
         <div class="content">
             <header class="page-header">
                 <a href="{{ route('home') }}" class="back-btn" aria-label="Back to home">←</a>
