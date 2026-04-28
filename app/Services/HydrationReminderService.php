@@ -97,6 +97,34 @@ class HydrationReminderService
         };
     }
 
+    // Return a practical default sip size when the athlete has not calibrated one yet.
+    public function calculateDefaultSipSize(?int $weightKg = null): int
+    {
+        if (!$weightKg || $weightKg <= 0) {
+            return 20;
+        }
+
+        if ($weightKg < 60) {
+            return 20;
+        }
+
+        if ($weightKg < 80) {
+            return 22;
+        }
+
+        return 25;
+    }
+
+    // Keep any sip measurement within the app's intended 20-25 ml range.
+    public function normalizeSipSize(?float $sipMl, ?int $weightKg = null): int
+    {
+        if (is_numeric($sipMl) && (float) $sipMl > 0) {
+            return max(20, min(25, (int) round((float) $sipMl)));
+        }
+
+        return $this->calculateDefaultSipSize($weightKg);
+    }
+
     // Estimate a sensible per-reminder drink amount based on daily target.
     public function calculateReminderVolume(int $weightKg, $temperature = 25, $humidity = 50, $durationMinutes = 30): int
     {

@@ -42,7 +42,7 @@ class HydrationController extends Controller
         $request->validate([
             'empty_weight' => 'required|numeric',
             'filled_weight' => 'required|numeric',
-            'sip_count' => 'required|numeric',
+            'sip_count' => 'required|integer|min:1',
             'remaining_weight' => 'required|numeric',
         ]);
 
@@ -56,6 +56,7 @@ class HydrationController extends Controller
         $consumedKg = $totalKg - ($remaining - $empty);
         $consumedMl = $consumedKg * 1000;
         $avgMlPerSip = ($sips > 0 && $consumedMl > 0) ? ($consumedMl / $sips) : 0;
+        $avgMlPerSip = max(20, min(25, $avgMlPerSip));
 
         // Save to athlete (adjust field name as needed)
         if ($athlete) {

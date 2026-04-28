@@ -126,20 +126,20 @@
                 <div class="mb-6">
 
                     <h3 class="text-blue-600 font-semibold">
-                        Step 5: Count The mL For Each Sip
+                        Step 5: Count Each Sip
                     </h3>
 
                     <p class="text-gray-700 mt-2">
-                        During the training session:
+                        During the training session, count how many sips you take.
                     </p>
 
                     <p class="mt-3 text-gray-700">
-                        Each time the user takes a sip, they count it.
+                        Write down the total number of sips at the end.
                     </p>
 
                     <p class="mt-3 text-gray-700">
-                        Example: 
-                        Sip count = 1, 2, 3…
+                        Example:
+                        Sip count = 1, 2, 3...
                     </p>
 
                 </div>

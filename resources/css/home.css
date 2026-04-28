@@ -29,7 +29,7 @@ body {
     display: grid;
     place-items: center;
     background: radial-gradient(circle at top, #59616f 0%, var(--page-bg) 48%, #3f4249 100%);
-    padding: clamp(10px, 5vw, 20px);
+    padding: 20px;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -webkit-font-smoothing: antialiased;
@@ -42,13 +42,12 @@ body.modal-locked {
 .app-shell {
     width: min(430px, 100%);
     min-height: auto;
-    max-height: 95vh;
-    overflow-y: auto;
+    max-height: 100dvh;
+    overflow: hidden;
     padding-top: max(0px, env(safe-area-inset-top));
     padding-bottom: max(0px, env(safe-area-inset-bottom));
     background: var(--shell-bg);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -94,35 +93,14 @@ body.modal-locked {
 
 .content {
     flex: 1;
-    overflow-y: auto;
-}
-
-.content {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(92, 102, 118, 0.28) transparent;
-}
-
-.content::-webkit-scrollbar {
-    width: 4px;
-}
-
-.content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.content::-webkit-scrollbar-thumb {
-    background: rgba(92, 102, 118, 0.28);
-    border-radius: 999px;
-}
-
-.content::-webkit-scrollbar-thumb:hover {
-    background: rgba(92, 102, 118, 0.45);
+    overflow: hidden;
+    padding: 18px 18px 12px;
 }
 
 .greeting {
-    margin: 0 0 24px;
+    margin: 0 0 16px;
     color: var(--text);
-    font-size: 32px;
+    font-size: 26px;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
@@ -130,8 +108,8 @@ body.modal-locked {
 .stats-card {
     background: var(--panel-bg);
     border-radius: 16px;
-    padding: 20px 24px;
-    margin-bottom: 18px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -177,7 +155,7 @@ body.modal-locked {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 6px 0;
 }
 
 .stat-row + .stat-row {
@@ -186,13 +164,13 @@ body.modal-locked {
 
 .stat-label {
     color: var(--muted);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .stat-value {
     color: var(--text);
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 700;
 }
 
@@ -200,7 +178,7 @@ body.modal-locked {
     background: var(--panel-bg);
     border-radius: 16px;
     width: 100%;
-    margin: 0 auto 18px;
+    margin: 0 auto 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     display: grid;
     place-items: center;
@@ -210,7 +188,7 @@ body.modal-locked {
 .ads-image {
     display: block;
     width: 100%;
-    height: 128px;
+    height: 98px;
     max-width: 100%;
     object-fit: cover;
     border-radius: 10px;
@@ -219,23 +197,23 @@ body.modal-locked {
 .timer-card {
     background: var(--panel-bg);
     border-radius: 16px;
-    padding: 28px 24px 32px;
+    padding: 18px 18px 20px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .timer-title {
-    margin: 0 0 24px;
+    margin: 0 0 14px;
     color: var(--text);
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
 }
 
 .timer-ring {
     position: relative;
-    width: 220px;
-    height: 220px;
-    margin: 0 auto 26px;
+    width: 190px;
+    height: 190px;
+    margin: 0 auto 16px;
 }
 
 .progress-ring {
@@ -270,27 +248,27 @@ body.modal-locked {
 .timer-label {
     margin: 0 0 4px;
     color: var(--muted);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
 }
 
 .timer-countdown {
     margin: 0;
     color: var(--text);
-    font-size: 48px;
+    font-size: 38px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: -0.02em;
 }
 
 .drink-btn {
-    width: 180px;
+    width: 170px;
     border: none;
     border-radius: 10px;
-    padding: 12px;
+    padding: 10px 12px;
     background: var(--accent-strong);
     color: #fff;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     cursor: pointer;
 }
@@ -302,16 +280,16 @@ body.modal-locked {
 .daily-stats-card {
     background: var(--panel-soft);
     border-radius: 16px;
-    padding: 20px;
-    margin-top: 18px;
+    padding: 16px;
+    margin-top: 14px;
     border: 1px solid var(--line);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .daily-stats-title {
-    margin: 0 0 12px;
+    margin: 0 0 10px;
     color: var(--text);
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 700;
 }
 
@@ -324,7 +302,7 @@ body.modal-locked {
 .daily-stat-box {
     background: var(--panel-bg);
     border-radius: 10px;
-    padding: 10px 6px;
+    padding: 8px 6px;
     text-align: center;
     border: 1px solid var(--line);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
@@ -333,13 +311,13 @@ body.modal-locked {
 .daily-stat-value {
     margin: 0;
     color: #4c7d8f;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 1;
 }
 
 .daily-stat-label {
-    margin: 6px 0 0;
+    margin: 4px 0 0;
     color: var(--muted);
     font-size: 12px;
     font-weight: 600;

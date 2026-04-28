@@ -50,7 +50,9 @@
 
                 <form id="drinkNowForm" method="POST" action="{{ route('athlete.drink') }}">
                     @csrf
-                    <button class="drink-btn" type="submit">Drink Now</button>
+                    <button class="drink-btn" type="submit">
+                        {{ !empty($drinkButtonMl) ? 'Drink Now (' . number_format((float) $drinkButtonMl, 0) . ' ml)' : 'Drink Now' }}
+                    </button>
                 </form>
             </section>
 
@@ -115,7 +117,7 @@
 
     <script>
         // --- Timer configuration ---
-        const totalSeconds = {{ $interval ?? 12 }};
+        const totalSeconds = 20;
         const defaultIntervalSeconds = Math.max(1, totalSeconds);
         const athleteTimerStorageKey = "hydration.home.timer." + {{ auth()->id() ?? 0 }};
         let intervalSeconds = defaultIntervalSeconds;
@@ -186,6 +188,10 @@
                 const savedEndAtMs = Number(parsed.endAtMs);
 
                 if (!Number.isFinite(savedIntervalSeconds) || savedIntervalSeconds <= 0) {
+                    return false;
+                }
+
+                if (savedIntervalSeconds !== defaultIntervalSeconds) {
                     return false;
                 }
 

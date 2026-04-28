@@ -332,6 +332,7 @@ class HydrationReminderController extends Controller
         $dailyTargetMl = $weightKg
             ? $this->hydrationService->calculateAdjustedDailyHydrationTarget((int) round($weightKg), $intervalTemperature, $intervalHumidity, 60)
             : null;
+        $drinkButtonMl = $this->hydrationService->normalizeSipSize($weeklyAvg, $weightKg ? (int) round($weightKg) : null);
         $weeklyTargetMl = $dailyTargetMl ? ($dailyTargetMl * 7) : null;
         $weeklyProgressPercent = ($weeklyTargetMl && ($athlete?->weekly_total_ml ?? 0) > 0)
             ? min(100, (int) round((($athlete->weekly_total_ml ?? 0) / $weeklyTargetMl) * 100))
@@ -364,6 +365,7 @@ class HydrationReminderController extends Controller
             'humidity' => $humidity,
             'dayStreak' => $dayStreak,
             'weeklyAvg' => $weeklyAvg,
+            'drinkButtonMl' => $drinkButtonMl,
             'athlete' => $athlete,
             'weightClass' => $weightClass,
             'dailyTargetMl' => $dailyTargetMl,
@@ -712,11 +714,8 @@ class HydrationReminderController extends Controller
             $this->syncDailyHydrationTotal($athlete);
             $weightKg = is_numeric($athlete->weight) ? (float) $athlete->weight : null;
 
-            // Prefer user-calibrated sip size. Fallback to class-adjusted reminder volume.
-            $drinkMl = $athlete->weekly_avg;
-            if (!$drinkMl && $weightKg) {
-                $drinkMl = $this->hydrationService->calculateReminderVolume((int) round($weightKg), 32, 74, 60);
-            }
+            // Prefer user-calibrated sip size. Fallback to a weight-based default in the 20-25 ml range.
+            $drinkMl = $this->hydrationService->normalizeSipSize($athlete->weekly_avg, $weightKg ? (int) round($weightKg) : null);
 
             if ($drinkMl) {
                 $athlete->weekly_total_ml += (float) $drinkMl;
