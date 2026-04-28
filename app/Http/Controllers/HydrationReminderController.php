@@ -150,6 +150,21 @@ class HydrationReminderController extends Controller
         $intensity = $this->normalizeIntensity((string) $request->input('intensity', 'beginner'));
         $totalDuration = ((int) $request->input('hours', 0) * 60) + (int) $request->input('minutes', 0);
 
+        // Save active session details for later completion.
+        $assignedSessionId = $request->input('assigned_session_id');
+        $assignedSession = null;
+
+        if ($assignedSessionId) {
+            $assignedSession = HydrationSession::find((int) $assignedSessionId);
+
+            // Use coach-assigned session details as source of truth.
+            if ($assignedSession && !$assignedSession->completed_at) {
+                $sport = (string) ($assignedSession->sport ?? $sport);
+                $intensity = $this->normalizeIntensity((string) ($assignedSession->intensity ?? $intensity));
+                $totalDuration = (int) ($assignedSession->planned_duration_minutes ?? $totalDuration);
+            }
+        }
+
         if ($totalDuration <= 0) {
             $totalDuration = 30;
         }
@@ -175,12 +190,7 @@ class HydrationReminderController extends Controller
             $weightKg
         );
 
-        // Save active session details for later completion.
-        $assignedSessionId = $request->input('assigned_session_id');
-
         if ($assignedSessionId) {
-            $assignedSession = HydrationSession::find((int) $assignedSessionId);
-
             if ($assignedSession && !$assignedSession->completed_at && !$assignedSession->started_at) {
                 $assignedSession->started_at = now();
                 $assignedSession->save();

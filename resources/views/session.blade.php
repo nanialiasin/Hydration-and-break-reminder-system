@@ -18,6 +18,14 @@
         </div>
 
         <div class="content">
+            @php
+                $showHighSweatRisk = (float) ($temp ?? 0) >= 32 && (float) ($humidity ?? 0) >= 60;
+                $initialDurationMinutes = max(1, (int) ($totalDuration ?? 30));
+                $initialHours = intdiv($initialDurationMinutes, 60);
+                $initialMinutes = $initialDurationMinutes % 60;
+                $initialTimerText = sprintf('%02d:%02d:00', $initialHours, $initialMinutes);
+            @endphp
+
             <div class="stats-card">
                 <div class="stat-row">
                     <span class="stat-label">Temperature</span>
@@ -29,12 +37,12 @@
                 </div>
             </div>
 
-            <div class="sweat-risk" id="sweatRiskWarning">
+            <div class="sweat-risk{{ $showHighSweatRisk ? '' : ' is-hidden' }}" id="sweatRiskWarning" style="{{ $showHighSweatRisk ? '' : 'display:none;' }}">
                 <span>HIGH SWEAT RISK</span>
             </div>
 
             <div class="timer-container">
-                <div class="timer" id="sessionTimer">00:00:00</div>
+                <div class="timer" id="sessionTimer">{{ $initialTimerText }}</div>
             </div>
 
             <form method="POST" action="{{ route('session.end') }}" class="session-actions">
