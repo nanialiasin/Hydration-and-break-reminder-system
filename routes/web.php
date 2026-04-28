@@ -287,6 +287,7 @@ Route::post('/logout', function () {
 
 
 Route::match(['get', 'post'], '/sensor/ingest', [HydrationReminderController::class, 'ingestSensorReading'])
+    ->withoutMiddleware(['verify_csrf_token'])
     ->name('sensor.ingest');
 
 Route::get('/sensor/latest', [HydrationReminderController::class, 'latestSensorReading'])
