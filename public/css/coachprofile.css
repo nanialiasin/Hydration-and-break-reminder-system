@@ -323,6 +323,8 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
     margin: 0 auto;
+
+    border-radius: 10px;
 }
 
 .bottom-nav {

@@ -25,7 +25,7 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
             @error('email')
-                <div class="alert alert-danger">{{ $message }}</div>
+                <div style="color: red; font-size: 0.875rem; margin-bottom: 8px;">{{ $message }}</div>
             @enderror
             <input class="field" id="email" type="email" name="email" placeholder="Email" autocomplete="email" value="{{ old('email') }}">
             <input class="field" id="password" type="password" name="password" placeholder="Password" autocomplete="current-password">

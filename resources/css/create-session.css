@@ -19,27 +19,27 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--page-bg);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+html {
+    width: 100%;
+    height: 100%;
 }
 
-.phone-shell {
+body {
+    font-family: "Poppins", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
     width: 100%;
-    max-width: 430px;
-    aspect-ratio: 9 / 19.5;
-    background-color: var(--shell-bg);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at top, #59616f 0%, var(--page-bg) 48%, #3f4249 100%);
+    padding: 20px;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-font-smoothing: antialiased;
 }
+
+
 
 .status-bar {
     background-color: #000;
@@ -85,11 +85,14 @@ body {
 
 .app-shell {
     width: min(430px, 100%);
-    max-height: 85vh;
+    min-height: min(890px, 96vh);
     background: var(--shell-bg);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 10px;
 }
 
 .content {
@@ -123,8 +126,17 @@ body {
 .session-form {
     background: white;
     border-radius: 20px;
+    width: 100%;
     padding: 28px 24px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.session-title {
+    margin: 0 0 18px;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
 }
 
 .form-group {
@@ -212,15 +224,12 @@ body {
 }
 
 .bottom-nav {
-    width: min(430px, 100%);
     background-color: #1c1c1e;
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 12px 0;
     border-top: 1px solid #2c2c2e;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
 }
 
 .nav-item {
@@ -253,12 +262,22 @@ body {
 }
 
 .app-shell {
+    width: min(430px, 100%);
+    min-height: min(890px, 96vh);
+    overflow: hidden;
+    background: var(--shell-bg);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
-    overflow: hidden;  /* Prevents scrolling on shell */
+
+    border-radius: 10px;
 }
 
 .content {
     flex: 1;
     overflow-y: auto;  /* Allows only content to scroll */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
 }

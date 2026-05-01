@@ -48,7 +48,7 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     $user = \App\Models\User::where('email', $credentials['email'])->first();
 
     if (!$user) {
-        return back()->withErrors(['email' => 'User does not exist.'])->withInput($request->only('email'));
+        return back()->withErrors(['email' => 'Incorrect username or password.'])->withInput($request->only('email'));
     }
 
     // Now, attempt to authenticate with the password

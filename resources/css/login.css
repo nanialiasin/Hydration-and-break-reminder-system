@@ -36,9 +36,9 @@ body {
 }
 
 .shell {
-    width: min(460px, 100%);
-    min-height: auto;
-    max-height: 95vh;
+    width: min(430px, 100%);
+    min-height: min(890px, 96vh);
+    max-height: 100dvh;
     overflow-y: auto;
     padding-top: max(56px, calc(56px + env(safe-area-inset-top)));
     padding-bottom: max(34px, calc(34px + env(safe-area-inset-bottom)));
@@ -154,10 +154,17 @@ form {
 }
 
 @media (max-width: 640px) {
-    .shell {
-        min-height: 85vh;
-        padding: 40px 18px 24px;
+    body {
+        padding: 8px;
     }
+
+    .shell {
+        min-height: 94vh;
+        width: min(94vw, 430px);
+        padding: 40px 18px 24px;
+    
+    border-radius: 10px;
+}
 
     .logo-wrap {
         width: 140px;

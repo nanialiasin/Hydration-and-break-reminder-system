@@ -64,20 +64,6 @@
             </div>
         </div>
 
-        <nav class="bottom-nav" aria-label="Main navigation">
-            <a href="{{ route('home') }}" class="nav-item" aria-label="Home">
-                <img src="{{ asset('images/Home Button.png') }}" alt="Home" width="24" height="24">
-            </a>
-            <a href="{{ route('training') }}" class="nav-item" aria-label="Training">
-                <img src="{{ asset('images/Training Button.svg') }}" alt="Training" width="24" height="24">
-            </a>
-            <a href="{{ route('history') }}" class="nav-item" aria-label="History">
-                <img src="{{ asset('images/History Button.svg') }}" alt="History" width="24" height="24">
-            </a>
-            <a href="#" class="nav-item" aria-label="Profile">
-                <img src="{{ asset('images/Account Button.svg') }}" alt="Account" width="24" height="24">
-            </a>
-        </nav>
     </div>
 </body>
 </html>

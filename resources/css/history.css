@@ -34,6 +34,8 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+
+    border-radius: 10px;
 }
 
 .status-bar {
@@ -250,7 +252,9 @@ body {
     .app-shell {
         width: min(96vw, 430px);
         min-height: 94vh;
-    }
+    
+    border-radius: 10px;
+}
 
     .content {
         padding: 20px 14px 16px;

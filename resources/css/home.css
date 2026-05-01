@@ -51,6 +51,8 @@ body.modal-locked {
     display: flex;
     flex-direction: column;
     position: relative;
+
+    border-radius: 10px;
 }
 
 .hydration-warning {
@@ -495,7 +497,9 @@ body.modal-locked {
     .app-shell {
         width: min(96vw, 430px);
         min-height: 94vh;
-    }
+    
+    border-radius: 10px;
+}
 
     .content {
         padding: 24px 16px 16px;

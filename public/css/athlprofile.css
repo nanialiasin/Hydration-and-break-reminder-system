@@ -20,6 +20,8 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+
+    border-radius: 10px;
 }
 
 .content {
@@ -258,7 +260,9 @@ input[type="range"] {
     .app-shell {
         min-height: 94vh;
         width: min(94vw, 430px);
-    }
+    
+    border-radius: 10px;
+}
 
     .profile-title {
         font-size: 30px;

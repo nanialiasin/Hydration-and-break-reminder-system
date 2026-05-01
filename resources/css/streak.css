@@ -37,6 +37,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: 32px 24px;
+
+    border-radius: 10px;
 }
 
 .streak-card {
@@ -101,7 +103,9 @@ body {
 @media (max-width: 640px) {
     .shell {
         min-height: 94vh;
-    }
+    
+    border-radius: 10px;
+}
 
     .streak-card {
         padding: 40px 24px 36px;

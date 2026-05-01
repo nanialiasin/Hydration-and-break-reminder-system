@@ -63,34 +63,8 @@
             </section>
             @endif
 
-            <section class="card session-card">
-                <h2 class="card-title">Session</h2>
-                @if($session && $session->sport)
-                    <div class="stats">
-                        <div class="stat-row">
-                            <span>Sport</span>
-                            <strong>{{ $session->sport }}</strong>
-                        </div>
-                        <div class="stat-row">
-                            <span>Beginner</span>
-                            <strong>{{ $session->beginner_duration ? sprintf('%d hr %d min', intdiv($session->beginner_duration, 60), $session->beginner_duration % 60) : 'Not Set' }}</strong>
-                        </div>
-                        <div class="stat-row">
-                            <span>Intermediate</span>
-                            <strong>{{ $session->intermediate_duration ? sprintf('%d hr %d min', intdiv($session->intermediate_duration, 60), $session->intermediate_duration % 60) : 'Not Set' }}</strong>
-                        </div>
-                        <div class="stat-row">
-                            <span>Advanced</span>
-                            <strong>{{ $session->advanced_duration ? sprintf('%d hr %d min', intdiv($session->advanced_duration, 60), $session->advanced_duration % 60) : 'Not Set' }}</strong>
-                        </div>
-                    </div>
-                @else
-                    <p class="empty-state">No session created yet.</p>
-                @endif
-
-                <div class="actions single-action">
-                    <a href="{{ route('session.create') }}" class="btn btn-create">Create New Session</a>
-                </div>
+            <div class="actions single-action">
+                <a href="{{ route('session.create') }}" class="btn btn-create">Create New Session</a>
             </div>
         </div>
         <nav class="bottom-nav" aria-label="Main navigation">

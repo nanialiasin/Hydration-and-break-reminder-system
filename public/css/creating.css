@@ -20,6 +20,8 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+
+    border-radius: 10px;
 }
 
 .content {
@@ -169,7 +171,9 @@ body {
     .app-shell {
         min-height: 94vh;
         width: min(94vw, 430px);
-    }
+    
+    border-radius: 10px;
+}
 
     .page-title {
         font-size: 26px;
